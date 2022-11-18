@@ -46,6 +46,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -160,19 +162,63 @@ public class ExportDataActivity extends BaseActivity {
                         if (header == 0xED && flag == 0x02 && cmd == 0x01) {
                             int dataCount = value[4] & 0xFF;
                             if (dataCount > 0) {
-                                Calendar calendar = Calendar.getInstance();
-                                String time = Utils.calendar2strDate(calendar, AppConstants.PATTERN_YYYY_MM_DD_HH_MM_SS);
                                 int index = 5;
                                 while (index < length) {
-                                    int dataLength = value[index];
+                                    int dataLength = value[index++] & 0xFF;
+                                    int type = value[index++] & 0xFF;
+                                    byte[] timeBytes = Arrays.copyOfRange(value, index, index + 5);
+                                    index += 5;
+                                    byte[] macBytes = Arrays.copyOfRange(value, index, index + 6);
+                                    index += 6;
+
+                                    long timestamp = MokoUtils.toInt(Arrays.copyOfRange(timeBytes, 0, 4)) * 1000L;
+                                    int timezone = timeBytes[4];
+
+
+                                    String id = "";
+                                    if (timezone < 0) {
+                                        if (timezone % 2 == 0) {
+                                            id = String.format(Locale.ROOT, "UTC%02d:00", timezone / 2);
+                                        } else {
+                                            id = timezone < -1 ? String.format(Locale.ROOT, "UTC%d:30", (timezone + 1) / 2) : "UTC-00:30";
+                                        }
+                                    } else if (timezone == 0) {
+                                        id = "UTC";
+                                    } else {
+                                        if (timezone % 2 == 0) {
+                                            id = String.format(Locale.ROOT, "UTC+%02d:00", timezone / 2);
+                                        } else {
+                                            id = String.format(Locale.ROOT, "UTC+%02d:30", (timezone - 1) / 2);
+                                        }
+                                    }
+                                    Calendar calendar = Calendar.getInstance();
+                                    TimeZone timeZone = TimeZone.getTimeZone(id);
+                                    calendar.setTimeZone(timeZone);
+                                    calendar.setTimeInMillis(timestamp);
+                                    final String time = Utils.calendar2strDate(calendar, AppConstants.PATTERN_YYYY_MM_DD_HH_MM_SS);
+                                    StringBuffer stringBuffer = new StringBuffer();
+                                    for (int i = 0, l = macBytes.length; i < l; i++) {
+                                        stringBuffer.append(MokoUtils.byte2HexString(macBytes[i]));
+                                        if (i < (l - 1))
+                                            stringBuffer.append(":");
+                                    }
+                                    final String mac = stringBuffer.toString();
+
+                                    final int rssi = value[index++];
+                                    final String rssiStr = String.format("%ddBm", rssi);
+
                                     String rawData = "";
-                                    if (dataLength > 0) {
-                                        index += 1;
-                                        byte[] rawDataBytes = Arrays.copyOfRange(value, index, index + dataLength);
+                                    if (dataLength > 13) {
+                                        byte[] rawDataBytes = Arrays.copyOfRange(value, index, index + dataLength - 13);
                                         rawData = MokoUtils.bytesToHexString(rawDataBytes);
                                     }
+
                                     ExportData exportData = new ExportData();
-                                    exportData.time = time;
+
+                                    exportData.time = String.format("%s %s", time, id);
+                                    exportData.rssi = rssi;
+                                    exportData.deviceType = String.valueOf(type);
+                                    exportData.mac = mac;
                                     exportData.rawData = rawData;
                                     if (mStartTime == 65535) {
                                         exportDatas.add(0, exportData);
@@ -183,12 +229,16 @@ public class ExportDataActivity extends BaseActivity {
 
                                     storeString.append(String.format("Time:%s", time));
                                     storeString.append("\n");
+                                    storeString.append(String.format("Mac Address:%s", mac));
+                                    storeString.append("\n");
+                                    storeString.append(String.format("RSSI:%s", rssiStr));
+                                    storeString.append("\n");
                                     if (!TextUtils.isEmpty(rawData)) {
                                         storeString.append(String.format("Raw Data:%s", rawData));
                                         storeString.append("\n");
                                     }
                                     storeString.append("\n");
-                                    index += dataLength;
+                                    index += dataLength - 13;
                                 }
                                 adapter.replaceData(exportDatas);
                             } else {

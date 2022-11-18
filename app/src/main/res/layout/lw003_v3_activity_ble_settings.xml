@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="@string/general_ble_settings"
+            android:text="@string/lw003_v3_general_ble_settings"
             android:textColor="@color/lw003_v3_white_ffffff"
             android:textSize="17sp"
             android:textStyle="bold" />
@@ -99,6 +99,55 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/et_adv_name" />
 
+            <EditText
+                android:id="@+id/et_adv_interval"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:hint="1 ~ 100"
+                android:inputType="number"
+                android:maxLength="3"
+                android:text=""
+                android:textColor="@color/lw003_v3_black_333333"
+                android:textColorHint="@color/lw003_v3_grey_ebebeb"
+                android:textSize="15sp"
+                app:layout_constraintHorizontal_bias="0.7"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_adv_name"
+                app:layout_constraintWidth_percent="0.3" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ADV Interval"
+                android:textColor="@color/lw003_v3_black_333333"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/et_adv_interval"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="@id/et_adv_interval" />
+
+            <View
+                style="@style/lw003_v3_divider_line"
+                android:layout_width="0dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_adv_interval" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="x 100ms"
+                android:textColor="@color/lw003_v3_black_333333"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/et_adv_interval"
+                app:layout_constraintLeft_toRightOf="@id/et_adv_interval"
+                app:layout_constraintTop_toTopOf="@id/et_adv_interval" />
+
             <TextView
                 android:id="@+id/tx_power"
                 android:layout_width="wrap_content"
@@ -110,7 +159,7 @@
                 android:textSize="15sp"
                 android:textStyle="bold"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/et_adv_name" />
+                app:layout_constraintTop_toBottomOf="@id/et_adv_interval" />
 
             <TextView
                 android:id="@+id/tx_power_range"
@@ -119,8 +168,8 @@
                 android:text="(-40,-20,-16,-12,-8-4,0,+2,+3,+4,+5,+6,+7,+8)"
                 android:textColor="@color/lw003_v3_grey_b3b3b3"
                 android:textSize="12sp"
-                app:layout_constraintTop_toBottomOf="@id/tx_power"
-                app:layout_constraintLeft_toLeftOf="parent" />
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tx_power" />
 
             <SeekBar
                 android:id="@+id/sb_tx_power"
@@ -178,7 +227,7 @@
                 android:gravity="center"
                 android:hint="1~60"
                 android:inputType="number"
-                android:maxLength="3"
+                android:maxLength="2"
                 android:text=""
                 android:textColor="@color/lw003_v3_black_333333"
                 android:textColorHint="@color/lw003_v3_grey_ebebeb"
@@ -199,6 +248,30 @@
                 app:layout_constraintBottom_toBottomOf="@id/et_adv_timeout"
                 app:layout_constraintLeft_toRightOf="@id/et_adv_timeout"
                 app:layout_constraintTop_toTopOf="@id/et_adv_timeout" />
+
+            <View
+                style="@style/lw003_v3_divider_line"
+                android:layout_width="0dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_adv_timeout" />
+
+            <CheckBox
+                android:id="@+id/cb_event_notify"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="20dp"
+                android:button="@null"
+                android:checked="false"
+                android:drawableRight="@drawable/lw003_v3_selector_cb_btn"
+                android:text="Bluetooth Event Notify"
+                android:textColor="@color/lw003_v3_black_333333"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_adv_timeout" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

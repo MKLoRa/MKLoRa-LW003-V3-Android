@@ -14,7 +14,6 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.elvishew.xlog.XLog;
@@ -25,12 +24,14 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.lw003v3.AppConstants;
-import com.moko.lw003v3.R;
-import com.moko.lw003v3.R2;
+import com.moko.lw003v3.databinding.Lw003V3ActivitySystemInfoBinding;
 import com.moko.lw003v3.dialog.LoadingMessageDialog;
+import com.moko.lw003v3.entity.PayloadFlag;
 import com.moko.lw003v3.service.DfuService;
+import com.moko.lw003v3.utils.DecoderModule;
 import com.moko.lw003v3.utils.FileUtils;
 import com.moko.lw003v3.utils.ToastUtils;
+import com.moko.lw003v3.utils.Utils;
 import com.moko.support.lw003v3.LoRaLW003V3MokoSupport;
 import com.moko.support.lw003v3.OrderTaskAssembler;
 import com.moko.support.lw003v3.entity.OrderCHAR;
@@ -47,8 +48,6 @@ import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import no.nordicsemi.android.dfu.DfuProgressListener;
 import no.nordicsemi.android.dfu.DfuProgressListenerAdapter;
 import no.nordicsemi.android.dfu.DfuServiceInitiator;
@@ -57,37 +56,26 @@ import no.nordicsemi.android.dfu.DfuServiceListenerHelper;
 public class SystemInfoActivity extends BaseActivity {
     public static final int REQUEST_CODE_SELECT_FIRMWARE = 0x10;
 
-    @BindView(R2.id.tv_software_version)
-    TextView tvSoftwareVersion;
-    @BindView(R2.id.tv_firmware_version)
-    TextView tvFirmwareVersion;
-    @BindView(R2.id.tv_hardware_version)
-    TextView tvHardwareVersion;
-    @BindView(R2.id.tv_battery_voltage)
-    TextView tvBatteryVoltage;
-    @BindView(R2.id.tv_mac_address)
-    TextView tvMacAddress;
-    @BindView(R2.id.tv_product_model)
-    TextView tvProductModel;
-    @BindView(R2.id.tv_manufacture)
-    TextView tvManufacture;
+    private Lw003V3ActivitySystemInfoBinding mBind;
     private boolean mReceiverTag = false;
     private String mDeviceMac;
     private String mDeviceName;
+    private PayloadFlag mPayloadFlag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw003_v3_activity_system_info);
-        ButterKnife.bind(this);
+        mBind = Lw003V3ActivitySystemInfoBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
+        mPayloadFlag = new PayloadFlag();
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
         showSyncingProgressDialog();
-        tvSoftwareVersion.postDelayed(() -> {
+        mBind.tvSoftwareVersion.postDelayed(() -> {
             List<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.getAdvName());
             orderTasks.add(OrderTaskAssembler.getMacAddress());
@@ -97,6 +85,18 @@ public class SystemInfoActivity extends BaseActivity {
             orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
             orderTasks.add(OrderTaskAssembler.getHardwareVersion());
             orderTasks.add(OrderTaskAssembler.getManufacturer());
+            orderTasks.add(OrderTaskAssembler.getBatteryExpend());
+            orderTasks.add(OrderTaskAssembler.getPayloadIBeaconContent());
+            orderTasks.add(OrderTaskAssembler.getPayloadEddystoneUIDContent());
+            orderTasks.add(OrderTaskAssembler.getPayloadEddystoneURLContent());
+            orderTasks.add(OrderTaskAssembler.getPayloadEddystoneTLMContent());
+            orderTasks.add(OrderTaskAssembler.getPayloadBXPIBeaconContent());
+            orderTasks.add(OrderTaskAssembler.getPayloadBXPDeviceInfoContent());
+            orderTasks.add(OrderTaskAssembler.getPayloadBXPAccContent());
+            orderTasks.add(OrderTaskAssembler.getPayloadBXPTHContent());
+            orderTasks.add(OrderTaskAssembler.getPayloadBXPButtonContent());
+            orderTasks.add(OrderTaskAssembler.getPayloadBXPTagContent());
+            orderTasks.add(OrderTaskAssembler.getPayloadOtherContent());
             LoRaLW003V3MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         }, 500);
         DfuServiceListenerHelper.registerProgressListener(this, mDfuProgressListener);
@@ -135,23 +135,23 @@ public class SystemInfoActivity extends BaseActivity {
                 switch (orderCHAR) {
                     case CHAR_MODEL_NUMBER:
                         String productModel = new String(value);
-                        tvProductModel.setText(productModel);
+                        mBind.tvProductModel.setText(productModel);
                         break;
                     case CHAR_SOFTWARE_REVISION:
                         String softwareVersion = new String(value);
-                        tvSoftwareVersion.setText(softwareVersion);
+                        mBind.tvSoftwareVersion.setText(softwareVersion);
                         break;
                     case CHAR_FIRMWARE_REVISION:
                         String firmwareVersion = new String(value);
-                        tvFirmwareVersion.setText(firmwareVersion);
+                        mBind.tvFirmwareVersion.setText(firmwareVersion);
                         break;
                     case CHAR_HARDWARE_REVISION:
                         String hardwareVersion = new String(value);
-                        tvHardwareVersion.setText(hardwareVersion);
+                        mBind.tvHardwareVersion.setText(hardwareVersion);
                         break;
                     case CHAR_MANUFACTURER_NAME:
                         String manufacture = new String(value);
-                        tvManufacture.setText(manufacture);
+                        mBind.tvManufacture.setText(manufacture);
                         break;
                     case CHAR_PARAMS:
                         if (value.length >= 4) {
@@ -179,7 +179,7 @@ public class SystemInfoActivity extends BaseActivity {
                                             byte[] batteryBytes = Arrays.copyOfRange(value, 4, 4 + length);
                                             int battery = MokoUtils.toInt(batteryBytes);
                                             String batteryStr = MokoUtils.getDecimalFormat("0.000").format(battery * 0.001);
-                                            tvBatteryVoltage.setText(String.format("%sV", batteryStr));
+                                            mBind.tvBatteryVoltage.setText(String.format("%sV", batteryStr));
                                         }
                                         break;
                                     case KEY_CHIP_MAC:
@@ -193,8 +193,51 @@ public class SystemInfoActivity extends BaseActivity {
                                             stringBuffer.insert(11, ":");
                                             stringBuffer.insert(14, ":");
                                             mDeviceMac = stringBuffer.toString().toUpperCase();
-                                            tvMacAddress.setText(mDeviceMac);
+                                            mBind.tvMacAddress.setText(mDeviceMac);
                                         }
+                                        break;
+                                    case KEY_BATTERY_EXPEND:
+                                        if (length == 12) {
+                                            int bleAdv = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 8));
+                                            int bleScan = MokoUtils.toInt(Arrays.copyOfRange(value, 8, 12));
+                                            int lora = MokoUtils.toInt(Arrays.copyOfRange(value, 12, 16));
+                                            mBind.tvBleAdv.setText(String.format("%ds", bleAdv));
+                                            mBind.tvBleScan.setText(String.format("%ds", bleScan));
+                                            mBind.tvLora.setText(String.format("%ds", lora));
+                                        }
+                                        break;
+                                    case KEY_PAYLOAD_IBEACON_CONTENT:
+                                        mPayloadFlag.iBeaconFlag = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 4 + length));
+                                        break;
+                                    case KEY_PAYLOAD_EDDYSTONE_UID_CONTENT:
+                                        mPayloadFlag.EddystoneUIDFlag = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 4 + length));
+                                        break;
+                                    case KEY_PAYLOAD_EDDYSTONE_URL_CONTENT:
+                                        mPayloadFlag.EddystoneURLFlag = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 4 + length));
+                                        break;
+                                    case KEY_PAYLOAD_EDDYSTONE_TLM_CONTENT:
+                                        mPayloadFlag.EddystoneTLMFlag = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 4 + length));
+                                        break;
+                                    case KEY_PAYLOAD_BXP_IBEACON_CONTENT:
+                                        mPayloadFlag.BXPiBeaconFlag = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 4 + length));
+                                        break;
+                                    case KEY_PAYLOAD_BXP_DEVICE_INFO_CONTENT:
+                                        mPayloadFlag.BXPDeviceInfoFlag = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 4 + length));
+                                        break;
+                                    case KEY_PAYLOAD_BXP_ACC_CONTENT:
+                                        mPayloadFlag.BXPACCFlag = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 4 + length));
+                                        break;
+                                    case KEY_PAYLOAD_BXP_TH_CONTENT:
+                                        mPayloadFlag.BXPTHFlag = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 4 + length));
+                                        break;
+                                    case KEY_PAYLOAD_BXP_TAG_CONTENT:
+                                        mPayloadFlag.BXPTagFlag = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 4 + length));
+                                        break;
+                                    case KEY_PAYLOAD_BXP_BUTTON_CONTENT:
+                                        mPayloadFlag.BXPButtonFlag = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 4 + length));
+                                        break;
+                                    case KEY_PAYLOAD_OTHER_CONTENT:
+                                        mPayloadFlag.OtherTypeFlag = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 4 + length));
                                         break;
                                 }
                             }
@@ -211,6 +254,26 @@ public class SystemInfoActivity extends BaseActivity {
         Intent intent = new Intent(this, LogDataActivity.class);
         intent.putExtra(AppConstants.EXTRA_KEY_DEVICE_MAC, mDeviceMac);
         startActivity(intent);
+    }
+
+
+    public void onDecoderExport(View view) {
+        if (isWindowLocked())
+            return;
+        showSyncingProgressDialog();
+        new Thread(() -> {
+            File file = DecoderModule.getInstance(this).createNewDecoder(mPayloadFlag);
+            runOnUiThread(() -> {
+                dismissSyncProgressDialog();
+                if (file != null) {
+                    // 发送邮件
+                    String address = "Development@mokotechnology.com";
+                    String title = "LW003-B_V3 Decoder";
+                    String content = title;
+                    Utils.sendEmail(this, address, content, title, "Choose Email Client", file);
+                }
+            });
+        }).start();
     }
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {

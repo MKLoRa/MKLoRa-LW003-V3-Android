@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -44,8 +45,12 @@ public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekB
 
     @BindView(R2.id.et_adv_name)
     EditText etAdvName;
+    @BindView(R2.id.et_adv_interval)
+    EditText etAdvInterval;
     @BindView(R2.id.et_adv_timeout)
     EditText etAdvTimeout;
+    @BindView(R2.id.cb_event_notify)
+    CheckBox cbEventNotify;
     @BindView(R2.id.iv_login_mode)
     ImageView ivLoginMode;
     @BindView(R2.id.sb_tx_power)
@@ -77,8 +82,10 @@ public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekB
         etAdvName.postDelayed(() -> {
             List<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.getAdvName());
+            orderTasks.add(OrderTaskAssembler.getAdvInterval());
             orderTasks.add(OrderTaskAssembler.getAdvTxPower());
             orderTasks.add(OrderTaskAssembler.getAdvTimeout());
+            orderTasks.add(OrderTaskAssembler.getBleEventNotifyEnable());
             orderTasks.add(OrderTaskAssembler.getPasswordVerifyEnable());
             LoRaLW003V3MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         }, 500);
@@ -128,7 +135,9 @@ public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekB
                                 int result = value[4] & 0xFF;
                                 switch (configKeyEnum) {
                                     case KEY_ADV_NAME:
+                                    case KEY_ADV_INTERVAL:
                                     case KEY_ADV_TIMEOUT:
+                                    case KEY_BLE_EVENT_NOTIFY_ENABLE:
                                     case KEY_ADV_TX_POWER:
                                         if (result != 1) {
                                             savedParamsError = true;
@@ -154,10 +163,22 @@ public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekB
                                             etAdvName.setText(new String(Arrays.copyOfRange(value, 4, 4 + length)));
                                         }
                                         break;
+                                    case KEY_ADV_INTERVAL:
+                                        if (length > 0) {
+                                            int interval = value[4] & 0xFF;
+                                            etAdvInterval.setText(String.valueOf(interval));
+                                        }
+                                        break;
                                     case KEY_ADV_TIMEOUT:
                                         if (length > 0) {
                                             int timeout = value[4] & 0xFF;
                                             etAdvTimeout.setText(String.valueOf(timeout));
+                                        }
+                                        break;
+                                    case KEY_BLE_EVENT_NOTIFY_ENABLE:
+                                        if (length > 0) {
+                                            int enable = value[4] & 0xFF;
+                                            cbEventNotify.setChecked(enable == 1);
                                         }
                                         break;
                                     case KEY_PASSWORD_VERIFY_ENABLE:
@@ -233,11 +254,16 @@ public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekB
     }
 
     private boolean isValid() {
+        final String advIntervalStr = etAdvInterval.getText().toString();
         final String advTimeoutStr = etAdvTimeout.getText().toString();
-        if (TextUtils.isEmpty(advTimeoutStr))
+        if (TextUtils.isEmpty(advIntervalStr) || TextUtils.isEmpty(advTimeoutStr))
             return false;
         final int timeout = Integer.parseInt(advTimeoutStr);
         if (timeout < 1 || timeout > 60) {
+            return false;
+        }
+        final int interval = Integer.parseInt(advIntervalStr);
+        if (interval < 1 || interval > 100) {
             return false;
         }
         return true;
@@ -246,14 +272,18 @@ public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekB
 
     private void saveParams() {
         final String advName = etAdvName.getText().toString();
+        final String advIntervalStr = etAdvInterval.getText().toString();
         final String timeoutStr = etAdvTimeout.getText().toString();
+        final int interval = Integer.parseInt(advIntervalStr);
         final int timeout = Integer.parseInt(timeoutStr);
         final int progress = sbTxPower.getProgress();
         TxPowerEnum txPowerEnum = TxPowerEnum.fromOrdinal(progress);
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setAdvName(advName));
+        orderTasks.add(OrderTaskAssembler.setAdvInterval(interval));
         orderTasks.add(OrderTaskAssembler.setAdvTimeout(timeout));
+        orderTasks.add(OrderTaskAssembler.setBleEventNotifyEnable(cbEventNotify.isChecked() ? 1 : 0));
         if (txPowerEnum != null) {
             orderTasks.add(OrderTaskAssembler.setAdvTxPower(txPowerEnum.getTxPower()));
         }

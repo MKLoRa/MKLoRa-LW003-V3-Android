@@ -124,6 +124,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_pabc_status"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -157,6 +158,46 @@
                     android:visibility="visible"
                     app:layout_constraintBaseline_toBaselineOf="@id/pcba_status"
                     app:layout_constraintLeft_toRightOf="@id/pcba_status" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@color/lw003_v3_white_ffffff"
+                android:padding="10dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cl_pabc_status">
+
+                <TextView
+                    android:id="@+id/working_time_reset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center_vertical"
+                    android:text="Working Time Reset"
+                    android:textColor="@color/lw003_v3_black_333333"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_working_time_reset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="20dp"
+                    android:background="@drawable/lw003_v3_shape_radius_blue_btn_bg"
+                    android:gravity="center"
+                    android:minWidth="70dp"
+                    android:text="Reset"
+                    android:onClick="onWorkingTimeReset"
+                    android:textColor="@color/lw003_v3_white_ffffff"
+                    android:textSize="15sp"
+                    android:visibility="visible"
+                    app:layout_constraintBaseline_toBaselineOf="@id/working_time_reset"
+                    app:layout_constraintRight_toRightOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,7 +12,6 @@ import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.lw003v3.AppConstants;
 import com.moko.lw003v3.R;
 import com.moko.lw003v3.R2;
 import com.moko.lw003v3.dialog.LoadingMessageDialog;
@@ -29,7 +28,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.Nullable;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -207,28 +207,28 @@ public class FilterRawDataSwitchActivity extends BaseActivity {
         if (isWindowLocked())
             return;
         Intent i = new Intent(this, FilterIBeaconActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        startFilterRawData.launch(i);
     }
 
     public void onFilterByUid(View view) {
         if (isWindowLocked())
             return;
         Intent i = new Intent(this, FilterUIDActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        startFilterRawData.launch(i);
     }
 
     public void onFilterByUrl(View view) {
         if (isWindowLocked())
             return;
         Intent i = new Intent(this, FilterUrlActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        startFilterRawData.launch(i);
     }
 
     public void onFilterByTlm(View view) {
         if (isWindowLocked())
             return;
         Intent i = new Intent(this, FilterTLMActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        startFilterRawData.launch(i);
     }
 
 
@@ -236,7 +236,7 @@ public class FilterRawDataSwitchActivity extends BaseActivity {
         if (isWindowLocked())
             return;
         Intent i = new Intent(this, FilterBXPIBeaconActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        startFilterRawData.launch(i);
     }
 
     public void onFilterByBXPDevice(View view) {
@@ -280,27 +280,25 @@ public class FilterRawDataSwitchActivity extends BaseActivity {
         if (isWindowLocked())
             return;
         Intent i = new Intent(this, FilterBXPButtonActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        startFilterRawData.launch(i);
     }
 
     public void onFilterByBXPTag(View view) {
         if (isWindowLocked())
             return;
         Intent i = new Intent(this, FilterBXPTagIdActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        startFilterRawData.launch(i);
     }
 
     public void onFilterByOther(View view) {
         if (isWindowLocked())
             return;
         Intent i = new Intent(this, FilterOtherActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        startFilterRawData.launch(i);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == AppConstants.REQUEST_CODE_FILTER_RAW_DATA) {
+    private final ActivityResultLauncher<Intent> startFilterRawData = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), callback -> {
+        if (callback != null && callback.getResultCode() == RESULT_OK) {
             showSyncingProgressDialog();
             tvFilterByIbeacon.postDelayed(() -> {
                 List<OrderTask> orderTasks = new ArrayList<>();
@@ -308,6 +306,6 @@ public class FilterRawDataSwitchActivity extends BaseActivity {
                 LoRaLW003V3MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
             }, 1000);
         }
-    }
+    });
 
 }

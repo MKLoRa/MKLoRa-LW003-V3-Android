@@ -159,6 +159,16 @@ public class LoRaAppSettingActivity extends BaseActivity {
         }
     }
 
+    public void onMulticastGroup(View view) {
+        if (isWindowLocked()) return;
+        startActivity(new Intent(this, MulticastGroupActivity.class));
+    }
+
+    public void onMessageTypeSettings(View view) {
+        if (isWindowLocked()) return;
+        startActivity(new Intent(this, MessageTypeActivity.class));
+    }
+
     private boolean isValid() {
         final String syncIntervalStr = etSyncInterval.getText().toString();
         if (TextUtils.isEmpty(syncIntervalStr))

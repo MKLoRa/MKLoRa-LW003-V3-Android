@@ -71,8 +71,8 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
     TextView tvUploadMode;
     @BindView(R2.id.tv_region)
     TextView tvRegion;
-    @BindView(R2.id.tv_message_type)
-    TextView tvMessageType;
+    @BindView(R2.id.tv_device_type)
+    TextView tvDeviceType;
     @BindView(R2.id.ll_advanced_setting)
     LinearLayout llAdvancedSetting;
     @BindView(R2.id.cb_advance_setting)
@@ -93,10 +93,6 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
     TextView tvDr2;
     @BindView(R2.id.ll_adr_options)
     LinearLayout llAdrOptions;
-    @BindView(R2.id.tv_max_retransmission_times)
-    TextView tvMaxRetransmissionTimes;
-    @BindView(R2.id.rl_max_retransmission_times)
-    RelativeLayout rlMaxRetransmissionTimes;
     @BindView(R2.id.et_adr_ack_limit)
     EditText etAdrAckLimit;
     @BindView(R2.id.et_adr_ack_delay)
@@ -105,17 +101,15 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
     private boolean mReceiverTag = false;
     private ArrayList<String> mModeList;
     private ArrayList<String> mRegionsList;
-    private ArrayList<String> mMessageTypeList;
-    private ArrayList<String> mMaxRetransmissionTimesList;
+    private ArrayList<String> mDeviceTypeList;
     private int mSelectedMode;
     private int mSelectedRegion;
-    private int mSelectedMessageType;
+    private int mSelectedDeviceType;
     private int mSelectedCh1;
     private int mSelectedCh2;
     private int mSelectedDr;
     private int mSelectedDr1;
     private int mSelectedDr2;
-    private int mSelectedMaxRetransmissionTimes;
     private int mMaxCH;
     private int mMaxDR;
     private boolean savedParamsError;
@@ -139,13 +133,10 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
         mRegionsList.add("IN865");
         mRegionsList.add("US915");
         mRegionsList.add("RU864");
-        mMessageTypeList = new ArrayList<>();
-        mMessageTypeList.add("Unconfirmed");
-        mMessageTypeList.add("Confirmed");
-        mMaxRetransmissionTimesList = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            mMaxRetransmissionTimesList.add(String.valueOf(i));
-        }
+        mDeviceTypeList = new ArrayList<>();
+        mDeviceTypeList.add("Class A");
+        mDeviceTypeList.add("Class C");
+
         cbAdvanceSetting.setOnCheckedChangeListener(this);
         cbAdr.setOnCheckedChangeListener(this);
         EventBus.getDefault().register(this);
@@ -161,6 +152,7 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
             etDevEui.postDelayed(() -> {
                 List<OrderTask> orderTasks = new ArrayList<>();
                 orderTasks.add(OrderTaskAssembler.getLoraUploadMode());
+                orderTasks.add(OrderTaskAssembler.getClassType());
                 orderTasks.add(OrderTaskAssembler.getLoraDevEUI());
                 orderTasks.add(OrderTaskAssembler.getLoraAppEUI());
                 orderTasks.add(OrderTaskAssembler.getLoraAppKey());
@@ -168,11 +160,9 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
                 orderTasks.add(OrderTaskAssembler.getLoraAppSKey());
                 orderTasks.add(OrderTaskAssembler.getLoraNwkSKey());
                 orderTasks.add(OrderTaskAssembler.getLoraRegion());
-                orderTasks.add(OrderTaskAssembler.getLoraMessageType());
                 orderTasks.add(OrderTaskAssembler.getLoraCH());
                 orderTasks.add(OrderTaskAssembler.getLoraDutyCycleEnable());
                 orderTasks.add(OrderTaskAssembler.getLoraDR());
-                orderTasks.add(OrderTaskAssembler.getLoraMaxRetransmissionTimes());
                 orderTasks.add(OrderTaskAssembler.getLoraAdrAckLimit());
                 orderTasks.add(OrderTaskAssembler.getLoraAdrAckDelay());
                 orderTasks.add(OrderTaskAssembler.getLoraUplinkStrategy());
@@ -223,6 +213,7 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
                                 int result = value[4] & 0xFF;
                                 switch (configKeyEnum) {
                                     case KEY_LORA_MODE:
+                                    case KEY_LORA_CLASS_TYPE:
                                     case KEY_LORA_DEV_EUI:
                                     case KEY_LORA_APP_EUI:
                                     case KEY_LORA_APP_KEY:
@@ -230,11 +221,9 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
                                     case KEY_LORA_APP_SKEY:
                                     case KEY_LORA_NWK_SKEY:
                                     case KEY_LORA_REGION:
-                                    case KEY_LORA_MESSAGE_TYPE:
                                     case KEY_LORA_CH:
                                     case KEY_LORA_DR:
                                     case KEY_LORA_DUTYCYCLE:
-                                    case KEY_LORA_MAX_RETRANSMISSION_TIMES:
                                     case KEY_LORA_ADR_ACK_LIMIT:
                                     case KEY_LORA_ADR_ACK_DELAY:
                                         if (result != 1) {
@@ -326,12 +315,11 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
                                             initDutyCycle();
                                         }
                                         break;
-                                    case KEY_LORA_MESSAGE_TYPE:
+                                    case KEY_LORA_CLASS_TYPE:
                                         if (length > 0) {
-                                            final int messageType = value[4] & 0xFF;
-                                            mSelectedMessageType = messageType;
-                                            tvMessageType.setText(mMessageTypeList.get(messageType));
-                                            rlMaxRetransmissionTimes.setVisibility(mSelectedMessageType == 0 ? View.GONE : View.VISIBLE);
+                                            final int classType = value[4] & 0xFF;
+                                            mSelectedDeviceType = classType == 0  ? 0 : 1;
+                                            tvDeviceType.setText(mDeviceTypeList.get(mSelectedDeviceType));
                                         }
                                         break;
                                     case KEY_LORA_CH:
@@ -357,13 +345,7 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
                                             tvDr.setText(String.valueOf(dr));
                                         }
                                         break;
-                                    case KEY_LORA_MAX_RETRANSMISSION_TIMES:
-                                        if (length > 0) {
-                                            final int times = value[4] & 0xFF;
-                                            mSelectedMaxRetransmissionTimes = times - 1;
-                                            tvMaxRetransmissionTimes.setText(mMaxRetransmissionTimesList.get(mSelectedMaxRetransmissionTimes));
-                                        }
-                                        break;
+
                                     case KEY_LORA_ADR_ACK_LIMIT:
                                         if (length > 0) {
                                             etAdrAckLimit.setText(String.valueOf(value[4] & 0xFF));
@@ -492,15 +474,14 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
         bottomDialog.show(getSupportFragmentManager());
     }
 
-    public void selectMessageType(View view) {
+    public void selectDeviceType(View view) {
         if (isWindowLocked())
             return;
         BottomDialog bottomDialog = new BottomDialog();
-        bottomDialog.setDatas(mMessageTypeList, mSelectedMessageType);
+        bottomDialog.setDatas(mDeviceTypeList, mSelectedDeviceType);
         bottomDialog.setListener(value -> {
-            tvMessageType.setText(mMessageTypeList.get(value));
-            mSelectedMessageType = value;
-            rlMaxRetransmissionTimes.setVisibility(mSelectedMessageType == 0 ? View.GONE : View.VISIBLE);
+            tvDeviceType.setText(mDeviceTypeList.get(value));
+            mSelectedDeviceType = value;
         });
         bottomDialog.show(getSupportFragmentManager());
     }
@@ -717,18 +698,6 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
         bottomDialog.show(getSupportFragmentManager());
     }
 
-    public void selectMaxRetransmissionTimes(View view) {
-        if (isWindowLocked())
-            return;
-        BottomDialog bottomDialog = new BottomDialog();
-        bottomDialog.setDatas(mMaxRetransmissionTimesList, mSelectedMaxRetransmissionTimes);
-        bottomDialog.setListener(value -> {
-            mSelectedMaxRetransmissionTimes = value;
-            tvMaxRetransmissionTimes.setText(mMaxRetransmissionTimesList.get(value));
-        });
-        bottomDialog.show(getSupportFragmentManager());
-    }
-
     public void onSave(View view) {
         if (isWindowLocked())
             return;
@@ -805,10 +774,7 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
             orderTasks.add(OrderTaskAssembler.setLoraAppKey(appKey));
         }
         orderTasks.add(OrderTaskAssembler.setLoraUploadMode(mSelectedMode + 1));
-        orderTasks.add(OrderTaskAssembler.setLoraMessageType(mSelectedMessageType));
-        if (mSelectedMessageType == 1) {
-            orderTasks.add(OrderTaskAssembler.setLoraMaxRetransmissionTimes(mSelectedMaxRetransmissionTimes + 1));
-        }
+        orderTasks.add(OrderTaskAssembler.setLoraClassType(mSelectedDeviceType == 0 ? 0 : 2));
         savedParamsError = false;
         // 保存并连接
         orderTasks.add(OrderTaskAssembler.setLoraRegion(mSelectedRegion));

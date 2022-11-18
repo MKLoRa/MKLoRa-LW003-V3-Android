@@ -2,12 +2,11 @@ package com.moko.lw003v3.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.CheckBox;
 
 import com.moko.lw003v3.R;
 import com.moko.lw003v3.R2;
@@ -20,8 +19,8 @@ import butterknife.ButterKnife;
 
 public class GeneralFragment extends Fragment {
     private static final String TAG = GeneralFragment.class.getSimpleName();
-    @BindView(R2.id.et_heartbeat_interval)
-    EditText etHeartbeatInterval;
+    @BindView(R2.id.cb_continuity_transfer_function)
+    CheckBox cbContinuityTransferFunction;
 
 
     private DeviceInfoActivity activity;
@@ -45,24 +44,12 @@ public class GeneralFragment extends Fragment {
         return view;
     }
 
-    public void setHeartbeatInterval(int interval) {
-        etHeartbeatInterval.setText(String.valueOf(interval));
-    }
-
-    public boolean isValid() {
-        final String intervalStr = etHeartbeatInterval.getText().toString();
-        if (TextUtils.isEmpty(intervalStr))
-            return false;
-        final int interval = Integer.parseInt(intervalStr);
-        if (interval < 300 || interval > 86400) {
-            return false;
-        }
-        return true;
-    }
-
     public void saveParams() {
-        final String intervalStr = etHeartbeatInterval.getText().toString();
-        final int interval = Integer.parseInt(intervalStr);
-        LoRaLW003V3MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setHeartBeatInterval(interval));
+        final int enable = cbContinuityTransferFunction.isChecked() ? 1 : 0;
+        LoRaLW003V3MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setContinuityTransferFunctionEnable(enable));
+    }
+
+    public void setEnable(int enable) {
+        cbContinuityTransferFunction.setChecked(enable == 1);
     }
 }

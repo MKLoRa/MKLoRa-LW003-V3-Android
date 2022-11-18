@@ -26,8 +26,6 @@ public class DeviceFragment extends Fragment {
     private static final String TAG = DeviceFragment.class.getSimpleName();
     @BindView(R2.id.tv_time_zone)
     TextView tvTimeZone;
-    @BindView(R2.id.iv_shutdown_payload)
-    ImageView ivShutdownPayload;
     @BindView(R2.id.tv_low_power_prompt)
     TextView tvLowPowerPrompt;
     @BindView(R2.id.tv_low_power_prompt_tips)
@@ -40,7 +38,6 @@ public class DeviceFragment extends Fragment {
     private ArrayList<String> mLowPowerPrompts;
     private int mSelectedLowPowerPrompt;
     private boolean mLowPowerPayloadEnable;
-    private boolean mShutdownPayloadEnable;
 
 
     private DeviceInfoActivity activity;
@@ -80,8 +77,11 @@ public class DeviceFragment extends Fragment {
             }
         }
         mLowPowerPrompts = new ArrayList<>();
-        mLowPowerPrompts.add("5%");
         mLowPowerPrompts.add("10%");
+        mLowPowerPrompts.add("20%");
+        mLowPowerPrompts.add("30%");
+        mLowPowerPrompts.add("40%");
+        mLowPowerPrompts.add("50%");
         return view;
     }
 
@@ -105,12 +105,6 @@ public class DeviceFragment extends Fragment {
         dialog.show(activity.getSupportFragmentManager());
     }
 
-    public void setShutdownPayload(int enable) {
-        mShutdownPayloadEnable = enable == 1;
-        ivShutdownPayload.setImageResource(mShutdownPayloadEnable ? R.drawable.lw003_v3_ic_checked : R.drawable.lw003_v3_ic_unchecked);
-    }
-
-
     public void setLowPowerPayload(int enable) {
         mLowPowerPayloadEnable = enable == 1;
         ivLowPowerPayload.setImageResource(mLowPowerPayloadEnable ? R.drawable.lw003_v3_ic_checked : R.drawable.lw003_v3_ic_unchecked);
@@ -119,17 +113,9 @@ public class DeviceFragment extends Fragment {
     public void setLowPower(int lowPower) {
         mSelectedLowPowerPrompt = lowPower;
         tvLowPowerPrompt.setText(mLowPowerPrompts.get(mSelectedLowPowerPrompt));
-        tvLowPowerPromptTips.setText(getString(R.string.low_power_prompt_tips, mLowPowerPrompts.get(mSelectedLowPowerPrompt)));
+        tvLowPowerPromptTips.setText(getString(R.string.lw003_v3_low_power_prompt_tips, mLowPowerPrompts.get(mSelectedLowPowerPrompt)));
     }
 
-    public void changeShutdownPayload() {
-        mShutdownPayloadEnable = !mShutdownPayloadEnable;
-        activity.showSyncingProgressDialog();
-        ArrayList<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.setShutdownPayloadEnable(mShutdownPayloadEnable ? 1 : 0));
-        orderTasks.add(OrderTaskAssembler.getShutdownPayloadEnable());
-        LoRaLW003V3MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-    }
 
     public void changeLowPowerPayload() {
         mLowPowerPayloadEnable = !mLowPowerPayloadEnable;
@@ -146,7 +132,7 @@ public class DeviceFragment extends Fragment {
         dialog.setListener(value -> {
             mSelectedLowPowerPrompt = value;
             tvLowPowerPrompt.setText(mLowPowerPrompts.get(value));
-            tvLowPowerPromptTips.setText(getString(R.string.low_power_prompt_tips, mLowPowerPrompts.get(value)));
+            tvLowPowerPromptTips.setText(getString(R.string.lw003_v3_low_power_prompt_tips, mLowPowerPrompts.get(value)));
             activity.showSyncingProgressDialog();
             ArrayList<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.setLowPowerPercent(value));

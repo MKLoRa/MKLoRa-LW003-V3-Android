@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.CheckBox;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -16,8 +15,7 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.lw003v3.R;
-import com.moko.lw003v3.R2;
+import com.moko.lw003v3.databinding.Lw003V3ActivityIndicatorSettingsBinding;
 import com.moko.lw003v3.dialog.LoadingMessageDialog;
 import com.moko.lw003v3.utils.ToastUtils;
 import com.moko.support.lw003v3.LoRaLW003V3MokoSupport;
@@ -33,30 +31,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class IndicatorSettingsActivity extends BaseActivity {
 
-    @BindView(R2.id.cb_low_power)
-    CheckBox cbLowPower;
-    @BindView(R2.id.cb_network_check)
-    CheckBox cbNetworkCheck;
-    @BindView(R2.id.cb_fix)
-    CheckBox cbFix;
-    @BindView(R2.id.cb_fix_success)
-    CheckBox cbFixSuccess;
-    @BindView(R2.id.cb_fix_fail)
-    CheckBox cbFixFail;
+    private Lw003V3ActivityIndicatorSettingsBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw003_v3_activity_indicator_settings);
-        ButterKnife.bind(this);
-
+        mBind = Lw003V3ActivityIndicatorSettingsBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
@@ -64,7 +49,7 @@ public class IndicatorSettingsActivity extends BaseActivity {
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
         showSyncingProgressDialog();
-        cbLowPower.postDelayed(() -> {
+        mBind.cbLowPower.postDelayed(() -> {
             List<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.getIndicatorStatus());
             LoRaLW003V3MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
@@ -133,11 +118,9 @@ public class IndicatorSettingsActivity extends BaseActivity {
                                         if (length > 0) {
                                             byte[] indicatorBytes = Arrays.copyOfRange(value, 4, 4 + length);
                                             int indicator = MokoUtils.toInt(indicatorBytes);
-                                            cbLowPower.setChecked((indicator & 1) == 1);
-                                            cbNetworkCheck.setChecked((indicator & 2) == 2);
-                                            cbFix.setChecked((indicator & 4) == 4);
-                                            cbFixSuccess.setChecked((indicator & 8) == 8);
-                                            cbFixFail.setChecked((indicator & 16) == 16);
+                                            mBind.cbLowPower.setChecked((indicator & 0x01) == 0x01);
+                                            mBind.cbCharging.setChecked((indicator & 0x02) == 0x02);
+                                            mBind.cbBluetoothBroadcast.setChecked((indicator & 0x04) == 0x04);
                                         }
                                         break;
                                 }
@@ -213,11 +196,9 @@ public class IndicatorSettingsActivity extends BaseActivity {
     public void onSave(View view) {
         if (isWindowLocked())
             return;
-        int indicator = (cbLowPower.isChecked() ? 1 : 0)
-                | (cbNetworkCheck.isChecked() ? 2 : 0)
-                | (cbFix.isChecked() ? 4 : 0)
-                | (cbFixSuccess.isChecked() ? 8 : 0)
-                | (cbFixFail.isChecked() ? 16 : 0);
+        int indicator = (mBind.cbLowPower.isChecked() ? 0x01 : 0)
+                | (mBind.cbCharging.isChecked() ? 0x02 : 0)
+                | (mBind.cbBluetoothBroadcast.isChecked() ? 0x04 : 0);
         savedParamsError = false;
         showSyncingProgressDialog();
         LoRaLW003V3MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setIndicatorStatus(indicator));

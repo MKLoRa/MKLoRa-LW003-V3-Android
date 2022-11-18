@@ -2,13 +2,15 @@ package com.moko.lw003v3.utils;
 
 import android.os.ParcelUuid;
 import android.os.SystemClock;
+import android.util.SparseArray;
 
+import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.lw003v3.entity.AdvInfo;
 import com.moko.support.lw003v3.entity.DeviceInfo;
 import com.moko.support.lw003v3.service.DeviceInfoParseable;
 
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import no.nordicsemi.android.support.v18.scanner.ScanRecord;
@@ -25,35 +27,46 @@ public class AdvInfoAnalysisImpl implements DeviceInfoParseable<AdvInfo> {
     public AdvInfo parseDeviceInfo(DeviceInfo deviceInfo) {
         ScanResult result = deviceInfo.scanResult;
         ScanRecord record = result.getScanRecord();
+        assert record != null;
         Map<ParcelUuid, byte[]> map = record.getServiceData();
         if (map == null || map.isEmpty())
             return null;
-        // 0x00:LR1110,0x10:L76
+        SparseArray<byte[]> manufacturer = result.getScanRecord().getManufacturerSpecificData();
+        if (manufacturer == null || manufacturer.size() == 0)
+            return null;
+        byte[] manufacturerSpecificDataByte = record.getManufacturerSpecificData(manufacturer.keyAt(0));
+        assert manufacturerSpecificDataByte != null;
+        if (manufacturerSpecificDataByte.length != 15)
+            return null;
         int deviceType = -1;
-        int txPower = -1;
-        boolean lowPower = false;
-        boolean verifyEnable = false;
-        Iterator iterator = map.keySet().iterator();
-        while (iterator.hasNext()) {
-            ParcelUuid parcelUuid = (ParcelUuid) iterator.next();
-            if (parcelUuid.toString().startsWith("0000aa09")) {
+        for (ParcelUuid parcelUuid : map.keySet()) {
+            if (parcelUuid.toString().startsWith("0000aa0a")) {
                 byte[] bytes = map.get(parcelUuid);
                 if (bytes != null) {
                     deviceType = bytes[0] & 0xFF;
-                    txPower = bytes[1];
-                    lowPower = (bytes[3] & 0x01) == 0x01;
-                    verifyEnable = (bytes[3] & 0x02) == 0x02;
                 }
             }
         }
         if (deviceType == -1)
             return null;
+        int txPower = manufacturerSpecificDataByte[0];
+        int battery = manufacturerSpecificDataByte[1] & 0xFF;
+        boolean verifyEnable = manufacturerSpecificDataByte[4] == 1;
+        byte[] tempBytes = Arrays.copyOfRange(manufacturerSpecificDataByte, 5, 7);
+        byte[] humidityBytes = Arrays.copyOfRange(manufacturerSpecificDataByte, 7, 9);
+        String tempStr = "";
+        String humidityStr = "";
+        int temp = MokoUtils.toInt(tempBytes);
+        int humidity = MokoUtils.toInt(humidityBytes);
+        if (temp != 0xFFFF && humidity != 0xFFFF) {
+            tempStr = MokoUtils.getDecimalFormat("#.##").format(MokoUtils.toIntSigned(tempBytes) * 0.01);
+            humidityStr = MokoUtils.getDecimalFormat("#.##").format(MokoUtils.toInt(humidityBytes) * 0.01);
+        }
         AdvInfo advInfo;
         if (advInfoHashMap.containsKey(deviceInfo.mac)) {
             advInfo = advInfoHashMap.get(deviceInfo.mac);
             advInfo.name = deviceInfo.name;
             advInfo.rssi = deviceInfo.rssi;
-            advInfo.lowPower = lowPower;
             advInfo.deviceType = deviceType;
             long currentTime = SystemClock.elapsedRealtime();
             long intervalTime = currentTime - advInfo.scanTime;
@@ -61,17 +74,22 @@ public class AdvInfoAnalysisImpl implements DeviceInfoParseable<AdvInfo> {
             advInfo.scanTime = currentTime;
             advInfo.txPower = txPower;
             advInfo.verifyEnable = verifyEnable;
+            advInfo.battery = battery;
+            advInfo.temp = tempStr;
+            advInfo.humidity = humidityStr;
             advInfo.connectable = result.isConnectable();
         } else {
             advInfo = new AdvInfo();
             advInfo.name = deviceInfo.name;
             advInfo.mac = deviceInfo.mac;
             advInfo.rssi = deviceInfo.rssi;
-            advInfo.lowPower = lowPower;
             advInfo.deviceType = deviceType;
             advInfo.scanTime = SystemClock.elapsedRealtime();
             advInfo.txPower = txPower;
             advInfo.verifyEnable = verifyEnable;
+            advInfo.battery = battery;
+            advInfo.temp = tempStr;
+            advInfo.humidity = humidityStr;
             advInfo.connectable = result.isConnectable();
             advInfoHashMap.put(deviceInfo.mac, advInfo);
         }

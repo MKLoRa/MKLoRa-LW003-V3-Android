@@ -12,7 +12,9 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.lw003v3.R;
 import com.moko.lw003v3.R2;
+import com.moko.lw003v3.dialog.AlertMessageDialog;
 import com.moko.lw003v3.dialog.LoadingMessageDialog;
+import com.moko.lw003v3.utils.ToastUtils;
 import com.moko.support.lw003v3.LoRaLW003V3MokoSupport;
 import com.moko.support.lw003v3.OrderTaskAssembler;
 import com.moko.support.lw003v3.entity.OrderCHAR;
@@ -117,11 +119,32 @@ public class SelfTestActivity extends BaseActivity {
                                         break;
                                 }
                             }
+                            if (flag == 0x01) {
+                                // write
+                                if (configKeyEnum == ParamsKeyEnum.KEY_WORKING_TIME_RESET) {
+                                    if (length == 1 && value[4] == 1)
+                                        ToastUtils.showToast(this, "Reset Successfully");
+                                }
+                            }
                         }
                         break;
                 }
             }
         });
+    }
+
+    public void onWorkingTimeReset(View view) {
+        if (isWindowLocked()) return;
+        AlertMessageDialog dialog = new AlertMessageDialog();
+        dialog.setTitle("Warning");
+        dialog.setMessage("Working time statistics will be reset!");
+        dialog.setCancel("Cancel");
+        dialog.setConfirm("OK");
+        dialog.setOnAlertConfirmListener(() -> {
+            showSyncingProgressDialog();
+            LoRaLW003V3MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setWorkingTimeReset());
+        });
+        dialog.show(getSupportFragmentManager());
     }
 
     @Override
@@ -157,4 +180,5 @@ public class SelfTestActivity extends BaseActivity {
     private void backHome() {
         finish();
     }
+
 }

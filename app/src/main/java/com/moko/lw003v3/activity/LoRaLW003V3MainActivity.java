@@ -37,6 +37,7 @@ import com.moko.lw003v3.dialog.PasswordDialog;
 import com.moko.lw003v3.dialog.ScanFilterDialog;
 import com.moko.lw003v3.entity.AdvInfo;
 import com.moko.lw003v3.utils.AdvInfoAnalysisImpl;
+import com.moko.lw003v3.utils.DecoderModule;
 import com.moko.lw003v3.utils.SPUtiles;
 import com.moko.lw003v3.utils.ToastUtils;
 import com.moko.support.lw003v3.LoRaLW003V3MokoSupport;
@@ -59,7 +60,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
-import androidx.annotation.Nullable;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -81,8 +83,8 @@ public class LoRaLW003V3MainActivity extends BaseActivity implements MokoScanDev
     @BindView(R2.id.tv_filter)
     TextView tv_filter;
     private boolean mReceiverTag = false;
-    private ConcurrentHashMap<String, AdvInfo> beaconInfoHashMap;
-    private ArrayList<AdvInfo> beaconInfos;
+    private ConcurrentHashMap<String, AdvInfo> advInfoMap;
+    private ArrayList<AdvInfo> advInfoList;
     private DeviceListAdapter adapter;
     private Animation animation = null;
     private MokoBleScanner mokoBleScanner;
@@ -110,11 +112,12 @@ public class LoRaLW003V3MainActivity extends BaseActivity implements MokoScanDev
             PATH_LOGCAT = getFilesDir().getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "MKLoRa" : "LW003V3");
         }
         LoRaLW003V3MokoSupport.getInstance().init(getApplicationContext());
+        DecoderModule.getInstance(this).copyAssets2SD();
         mSavedPassword = SPUtiles.getStringValue(this, AppConstants.SP_KEY_SAVED_PASSWORD_LW003V3, "");
-        beaconInfoHashMap = new ConcurrentHashMap<>();
-        beaconInfos = new ArrayList<>();
+        advInfoMap = new ConcurrentHashMap<>();
+        advInfoList = new ArrayList<>();
         adapter = new DeviceListAdapter();
-        adapter.replaceData(beaconInfos);
+        adapter.replaceData(advInfoList);
         adapter.setOnItemChildClickListener(this);
         adapter.openLoadAnimation();
         rvDevices.setLayoutManager(new LinearLayoutManager(this));
@@ -145,7 +148,7 @@ public class LoRaLW003V3MainActivity extends BaseActivity implements MokoScanDev
         }
         animation = AnimationUtils.loadAnimation(this, R.anim.lw003_v3_rotate_refresh);
         ivRefresh.startAnimation(animation);
-        beaconInfoParseable = new AdvInfoAnalysisImpl();
+        advInfoAnalysis = new AdvInfoAnalysisImpl();
         mokoBleScanner.startScanDevice(this);
         mHandler.postDelayed(new Runnable() {
             @Override
@@ -156,18 +159,18 @@ public class LoRaLW003V3MainActivity extends BaseActivity implements MokoScanDev
     }
 
 
-    private AdvInfoAnalysisImpl beaconInfoParseable;
+    private AdvInfoAnalysisImpl advInfoAnalysis;
     public String filterName;
     public int filterRssi = -127;
 
     @Override
     public void onStartScan() {
-        beaconInfoHashMap.clear();
+        advInfoMap.clear();
         new Thread(() -> {
             while (animation != null) {
                 runOnUiThread(() -> {
-                    adapter.replaceData(beaconInfos);
-                    tvDeviceNum.setText(String.format("DEVICE(%d)", beaconInfos.size()));
+                    adapter.replaceData(advInfoList);
+                    tvDeviceNum.setText(String.format("DEVICE(%d)", advInfoList.size()));
                 });
                 try {
                     Thread.sleep(500);
@@ -181,10 +184,10 @@ public class LoRaLW003V3MainActivity extends BaseActivity implements MokoScanDev
 
     @Override
     public void onScanDevice(DeviceInfo deviceInfo) {
-        AdvInfo beaconInfo = beaconInfoParseable.parseDeviceInfo(deviceInfo);
+        AdvInfo beaconInfo = advInfoAnalysis.parseDeviceInfo(deviceInfo);
         if (beaconInfo == null)
             return;
-        beaconInfoHashMap.put(beaconInfo.mac, beaconInfo);
+        advInfoMap.put(beaconInfo.mac, beaconInfo);
     }
 
     @Override
@@ -194,23 +197,23 @@ public class LoRaLW003V3MainActivity extends BaseActivity implements MokoScanDev
     }
 
     private void updateDevices() {
-        beaconInfos.clear();
+        advInfoList.clear();
         if (!TextUtils.isEmpty(filterName) || filterRssi != -127) {
-            ArrayList<AdvInfo> beaconInfosFilter = new ArrayList<>(beaconInfoHashMap.values());
-            Iterator<AdvInfo> iterator = beaconInfosFilter.iterator();
+            ArrayList<AdvInfo> advInfoListFilter = new ArrayList<>(advInfoMap.values());
+            Iterator<AdvInfo> iterator = advInfoListFilter.iterator();
             while (iterator.hasNext()) {
-                AdvInfo beaconInfo = iterator.next();
-                if (beaconInfo.rssi > filterRssi) {
+                AdvInfo advInfo = iterator.next();
+                if (advInfo.rssi > filterRssi) {
                     if (TextUtils.isEmpty(filterName)) {
                         continue;
                     } else {
-                        if (TextUtils.isEmpty(beaconInfo.name) && TextUtils.isEmpty(beaconInfo.mac)) {
+                        if (TextUtils.isEmpty(advInfo.name) && TextUtils.isEmpty(advInfo.mac)) {
                             iterator.remove();
-                        } else if (TextUtils.isEmpty(beaconInfo.name) && beaconInfo.mac.toLowerCase().replaceAll(":", "").contains(filterName.toLowerCase())) {
+                        } else if (TextUtils.isEmpty(advInfo.name) && advInfo.mac.toLowerCase().replaceAll(":", "").contains(filterName.toLowerCase())) {
                             continue;
-                        } else if (TextUtils.isEmpty(beaconInfo.mac) && beaconInfo.name.toLowerCase().contains(filterName.toLowerCase())) {
+                        } else if (TextUtils.isEmpty(advInfo.mac) && advInfo.name.toLowerCase().contains(filterName.toLowerCase())) {
                             continue;
-                        } else if (!TextUtils.isEmpty(beaconInfo.name) && !TextUtils.isEmpty(beaconInfo.mac) && (beaconInfo.name.toLowerCase().contains(filterName.toLowerCase()) || beaconInfo.mac.toLowerCase().replaceAll(":", "").contains(filterName.toLowerCase()))) {
+                        } else if (!TextUtils.isEmpty(advInfo.name) && !TextUtils.isEmpty(advInfo.mac) && (advInfo.name.toLowerCase().contains(filterName.toLowerCase()) || advInfo.mac.toLowerCase().replaceAll(":", "").contains(filterName.toLowerCase()))) {
                             continue;
                         } else {
                             iterator.remove();
@@ -220,12 +223,12 @@ public class LoRaLW003V3MainActivity extends BaseActivity implements MokoScanDev
                     iterator.remove();
                 }
             }
-            beaconInfos.addAll(beaconInfosFilter);
+            advInfoList.addAll(advInfoListFilter);
         } else {
-            beaconInfos.addAll(beaconInfoHashMap.values());
+            advInfoList.addAll(advInfoMap.values());
         }
         System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
-        Collections.sort(beaconInfos, (lhs, rhs) -> {
+        Collections.sort(advInfoList, (lhs, rhs) -> {
             if (lhs.rssi > rhs.rssi) {
                 return -1;
             } else if (lhs.rssi < rhs.rssi) {
@@ -450,12 +453,12 @@ public class LoRaLW003V3MainActivity extends BaseActivity implements MokoScanDev
                 XLog.i("Success");
                 Intent i = new Intent(LoRaLW003V3MainActivity.this, DeviceInfoActivity.class);
                 i.putExtra(AppConstants.EXTRA_KEY_DEVICE_TYPE, mDeviceType);
-                startActivityForResult(i, AppConstants.REQUEST_CODE_DEVICE_INFO);
+                startDeviceInfo.launch(i);
                 return;
             }
             showLoadingMessageDialog();
             mHandler.postDelayed(() -> {
-                // open password notify and set passwrord
+                // open password notify and set password
                 List<OrderTask> orderTasks = new ArrayList<>();
                 orderTasks.add(OrderTaskAssembler.setPassword(mPassword));
                 LoRaLW003V3MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
@@ -493,7 +496,7 @@ public class LoRaLW003V3MainActivity extends BaseActivity implements MokoScanDev
                                 XLog.i("Success");
                                 Intent i = new Intent(LoRaLW003V3MainActivity.this, DeviceInfoActivity.class);
                                 i.putExtra(AppConstants.EXTRA_KEY_DEVICE_TYPE, mDeviceType);
-                                startActivityForResult(i, AppConstants.REQUEST_CODE_DEVICE_INFO);
+                                startDeviceInfo.launch(i);
                             }
                             if (0 == result) {
                                 isPasswordError = true;
@@ -506,18 +509,13 @@ public class LoRaLW003V3MainActivity extends BaseActivity implements MokoScanDev
         }
     }
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == AppConstants.REQUEST_CODE_DEVICE_INFO) {
-            if (resultCode == RESULT_OK) {
-                if (animation == null) {
-                    startScan();
-                }
+    private final ActivityResultLauncher<Intent> startDeviceInfo = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), callback -> {
+        if (callback != null && callback.getResultCode() == RESULT_OK) {
+            if (animation == null) {
+                startScan();
             }
         }
-    }
+    });
 
     private LoadingDialog mLoadingDialog;
 
