@@ -13,9 +13,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -24,8 +21,8 @@ import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.lw003v3.AppConstants;
 import com.moko.lw003v3.R;
-import com.moko.lw003v3.R2;
 import com.moko.lw003v3.adapter.ExportDataListAdapter;
+import com.moko.lw003v3.databinding.Lw003V3ActivityExportDataBinding;
 import com.moko.lw003v3.dialog.AlertMessageDialog;
 import com.moko.lw003v3.dialog.LoadingMessageDialog;
 import com.moko.lw003v3.utils.ToastUtils;
@@ -50,33 +47,13 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class ExportDataActivity extends BaseActivity {
 
     private static final String TRACKED_FILE = "tracked.txt";
 
     private static String PATH_LOGCAT;
-    @BindView(R2.id.et_time)
-    EditText etTime;
-    @BindView(R2.id.tv_start)
-    TextView tvStart;
-    @BindView(R2.id.iv_sync)
-    ImageView ivSync;
-    @BindView(R2.id.tv_sync)
-    TextView tvSync;
-    @BindView(R2.id.tv_empty)
-    TextView tvEmpty;
-    @BindView(R2.id.tv_export)
-    TextView tvExport;
-    @BindView(R2.id.tv_sum)
-    TextView tvSum;
-    @BindView(R2.id.tv_count)
-    TextView tvCount;
-    @BindView(R2.id.rv_export_data)
-    RecyclerView rvExportData;
+    private Lw003V3ActivityExportDataBinding mBind;
     private boolean mReceiverTag = false;
     private StringBuilder storeString;
     private ArrayList<ExportData> exportDatas;
@@ -91,8 +68,8 @@ public class ExportDataActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw003_v3_activity_export_data);
-        ButterKnife.bind(this);
+        mBind = Lw003V3ActivityExportDataBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         exportDatas = LoRaLW003V3MokoSupport.getInstance().exportDatas;
         storeString = LoRaLW003V3MokoSupport.getInstance().storeString;
         mStartTime = LoRaLW003V3MokoSupport.getInstance().startTime;
@@ -100,14 +77,14 @@ public class ExportDataActivity extends BaseActivity {
         if (exportDatas != null && exportDatas.size() > 0 && storeString != null) {
             mIsStart = true;
             if (mStartTime > 0) {
-                etTime.setText(String.valueOf(mStartTime));
+                mBind.etTime.setText(String.valueOf(mStartTime));
             }
             if (mSum > 0) {
-                tvSum.setText(String.format("Sum:%d", mSum));
+                mBind.tvSum.setText(String.format("Sum:%d", mSum));
             }
-            tvCount.setText(String.format("Count:%d", exportDatas.size()));
-            tvExport.setEnabled(true);
-            tvEmpty.setEnabled(true);
+            mBind.tvCount.setText(String.format("Count:%d", exportDatas.size()));
+            mBind.tvExport.setEnabled(true);
+            mBind.tvEmpty.setEnabled(true);
         } else {
             exportDatas = new ArrayList<>();
             storeString = new StringBuilder();
@@ -116,8 +93,8 @@ public class ExportDataActivity extends BaseActivity {
         adapter = new ExportDataListAdapter();
         adapter.openLoadAnimation();
         adapter.replaceData(exportDatas);
-        rvExportData.setLayoutManager(new LinearLayoutManager(this));
-        rvExportData.setAdapter(adapter);
+        mBind.rvExportData.setLayoutManager(new LinearLayoutManager(this));
+        mBind.rvExportData.setAdapter(adapter);
         PATH_LOGCAT = LoRaLW003V3MainActivity.PATH_LOGCAT + File.separator + TRACKED_FILE;
         EventBus.getDefault().register(this);
         // 注册广播接收器
@@ -225,13 +202,15 @@ public class ExportDataActivity extends BaseActivity {
                                     } else {
                                         exportDatas.add(exportData);
                                     }
-                                    tvCount.setText(String.format("Count:%d", exportDatas.size()));
+                                    mBind.tvCount.setText(String.format("Count:%d", exportDatas.size()));
 
-                                    storeString.append(String.format("Time:%s", time));
+                                    storeString.append(String.format("Time:%s", exportData.time));
                                     storeString.append("\n");
                                     storeString.append(String.format("Mac Address:%s", mac));
                                     storeString.append("\n");
                                     storeString.append(String.format("RSSI:%s", rssiStr));
+                                    storeString.append("\n");
+                                    storeString.append(String.format("Device Type:%s", exportData.deviceType));
                                     storeString.append("\n");
                                     if (!TextUtils.isEmpty(rawData)) {
                                         storeString.append(String.format("Raw Data:%s", rawData));
@@ -244,7 +223,7 @@ public class ExportDataActivity extends BaseActivity {
                             } else {
                                 byte[] sumBytes = Arrays.copyOfRange(value, 5, length);
                                 int sum = MokoUtils.toInt(sumBytes);
-                                tvSum.setText(String.format("Sum:%d", sum));
+                                mBind.tvSum.setText(String.format("Sum:%d", sum));
                                 LoRaLW003V3MokoSupport.getInstance().sum = sum;
                             }
 
@@ -301,9 +280,9 @@ public class ExportDataActivity extends BaseActivity {
                                             writeTrackedFile("");
                                             exportDatas.clear();
                                             adapter.replaceData(exportDatas);
-                                            tvExport.setEnabled(false);
-                                            tvSum.setText("Sum:0");
-                                            tvCount.setText("Count:0");
+                                            mBind.tvExport.setEnabled(false);
+                                            mBind.tvSum.setText("Sum:0");
+                                            mBind.tvCount.setText("Count:0");
                                             ToastUtils.showToast(this, "Empty success!");
                                         }
                                         break;
@@ -322,20 +301,20 @@ public class ExportDataActivity extends BaseActivity {
                                             }
                                             if (!mIsSync) {
                                                 mIsSync = true;
-                                                tvEmpty.setEnabled(false);
-                                                tvExport.setEnabled(false);
+                                                mBind.tvEmpty.setEnabled(false);
+                                                mBind.tvExport.setEnabled(false);
                                                 Animation animation = AnimationUtils.loadAnimation(this, R.anim.lw003_v3_rotate_refresh);
-                                                ivSync.startAnimation(animation);
-                                                tvSync.setText("Stop");
+                                                mBind.ivSync.startAnimation(animation);
+                                                mBind.tvSync.setText("Stop");
                                             } else {
                                                 mIsSync = false;
-                                                tvStart.setEnabled(true);
+                                                mBind.tvStart.setEnabled(true);
                                                 if (exportDatas != null && exportDatas.size() > 0 && storeString != null) {
-                                                    tvEmpty.setEnabled(true);
-                                                    tvExport.setEnabled(true);
+                                                    mBind.tvEmpty.setEnabled(true);
+                                                    mBind.tvExport.setEnabled(true);
                                                 }
-                                                ivSync.clearAnimation();
-                                                tvSync.setText("Sync");
+                                                mBind.ivSync.clearAnimation();
+                                                mBind.tvSync.setText("Sync");
                                             }
                                         }
                                         break;
@@ -345,12 +324,12 @@ public class ExportDataActivity extends BaseActivity {
                                         } else {
                                             mIsStart = true;
                                             mIsSync = true;
-                                            tvStart.setEnabled(false);
-                                            tvEmpty.setEnabled(false);
-                                            tvExport.setEnabled(false);
+                                            mBind.tvStart.setEnabled(false);
+                                            mBind.tvEmpty.setEnabled(false);
+                                            mBind.tvExport.setEnabled(false);
                                             Animation animation = AnimationUtils.loadAnimation(this, R.anim.lw003_v3_rotate_refresh);
-                                            ivSync.startAnimation(animation);
-                                            tvSync.setText("Stop");
+                                            mBind.ivSync.startAnimation(animation);
+                                            mBind.tvSync.setText("Stop");
                                         }
                                         break;
                                 }
@@ -430,7 +409,7 @@ public class ExportDataActivity extends BaseActivity {
     public void onStart(View view) {
         if (isWindowLocked())
             return;
-        final String timeStr = etTime.getText().toString();
+        final String timeStr = mBind.etTime.getText().toString();
         if (TextUtils.isEmpty(timeStr)) {
             ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
             return;
@@ -451,8 +430,8 @@ public class ExportDataActivity extends BaseActivity {
         writeTrackedFile("");
         exportDatas.clear();
         adapter.replaceData(exportDatas);
-        tvSum.setText("Sum:N/A");
-        tvCount.setText("Count:0");
+        mBind.tvSum.setText("Sum:N/A");
+        mBind.tvCount.setText("Count:0");
         showSyncingProgressDialog();
         LoRaLW003V3MokoSupport.getInstance().sendOrder(OrderTaskAssembler.readStorageData(time));
     }
@@ -488,7 +467,7 @@ public class ExportDataActivity extends BaseActivity {
             return;
         showSyncingProgressDialog();
         writeTrackedFile("");
-        tvExport.postDelayed(() -> {
+        mBind.tvExport.postDelayed(() -> {
             dismissSyncProgressDialog();
             final String log = storeString.toString();
             if (!TextUtils.isEmpty(log)) {

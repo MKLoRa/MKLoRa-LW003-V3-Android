@@ -7,29 +7,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.moko.ble.lib.task.OrderTask;
-import com.moko.lw003v3.R;
-import com.moko.lw003v3.R2;
 import com.moko.lw003v3.activity.DeviceInfoActivity;
+import com.moko.lw003v3.databinding.Lw003V3FragmentScannerBinding;
 import com.moko.support.lw003v3.LoRaLW003V3MokoSupport;
 import com.moko.support.lw003v3.OrderTaskAssembler;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class ScannerFragment extends Fragment {
     private static final String TAG = ScannerFragment.class.getSimpleName();
-    @BindView(R2.id.et_heartbeat_interval)
-    EditText etHeartbeatInterval;
-    @BindView(R2.id.tv_report_data_max_length)
-    TextView tvReportDataMaxLength;
-    @BindView(R2.id.tv_data_retention_strategy)
-    TextView tvDataRetentionStrategy;
+
+    private Lw003V3FragmentScannerBinding mBind;
+
     private DeviceInfoActivity activity;
     private int mSelectedStrategy;
     private int mSelectedMaxLength;
@@ -47,29 +38,28 @@ public class ScannerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        View view = inflater.inflate(R.layout.lw003_v3_fragment_scanner, container, false);
-        ButterKnife.bind(this, view);
+        mBind = Lw003V3FragmentScannerBinding.inflate(inflater, container, false);
         activity = (DeviceInfoActivity) getActivity();
-        return view;
+        return mBind.getRoot();
     }
 
 
     public void setHeartbeatInterval(int interval) {
-        etHeartbeatInterval.setText(String.valueOf(interval));
+        mBind.etHeartbeatInterval.setText(String.valueOf(interval));
     }
 
     public void setDataRetentionStrategy(int strategy, String strategyStr) {
         mSelectedStrategy = strategy;
-        tvDataRetentionStrategy.setText(strategyStr);
+        mBind.tvDataRetentionStrategy.setText(strategyStr);
     }
 
     public void setReportDataMaxLength(int maxLength, String maxLengthStr) {
         mSelectedMaxLength = maxLength;
-        tvReportDataMaxLength.setText(maxLengthStr);
+        mBind.tvReportDataMaxLength.setText(maxLengthStr);
     }
 
     public boolean isValid() {
-        final String intervalStr = etHeartbeatInterval.getText().toString();
+        final String intervalStr = mBind.etHeartbeatInterval.getText().toString();
         if (TextUtils.isEmpty(intervalStr))
             return false;
         final int interval = Integer.parseInt(intervalStr);
@@ -80,7 +70,7 @@ public class ScannerFragment extends Fragment {
     }
 
     public void saveParams() {
-        final String intervalStr = etHeartbeatInterval.getText().toString();
+        final String intervalStr = mBind.etHeartbeatInterval.getText().toString();
         final int interval = Integer.parseInt(intervalStr);
         ArrayList<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setHeartBeatInterval(interval));

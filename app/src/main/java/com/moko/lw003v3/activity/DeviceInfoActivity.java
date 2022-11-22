@@ -11,11 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -25,7 +21,7 @@ import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.lw003v3.AppConstants;
 import com.moko.lw003v3.R;
-import com.moko.lw003v3.R2;
+import com.moko.lw003v3.databinding.Lw003V3ActivityDeviceInfoBinding;
 import com.moko.lw003v3.dialog.AlertMessageDialog;
 import com.moko.lw003v3.dialog.BottomDialog;
 import com.moko.lw003v3.dialog.ChangePasswordDialog;
@@ -53,27 +49,10 @@ import java.util.TimerTask;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.IdRes;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnCheckedChangeListener {
 
-    @BindView(R2.id.frame_container)
-    FrameLayout frameContainer;
-    @BindView(R2.id.radioBtn_lora)
-    RadioButton radioBtnLora;
-    @BindView(R2.id.radioBtn_scanner)
-    RadioButton radioBtnScanner;
-    @BindView(R2.id.radioBtn_general)
-    RadioButton radioBtnGeneral;
-    @BindView(R2.id.radioBtn_device)
-    RadioButton radioBtnDevice;
-    @BindView(R2.id.rg_options)
-    RadioGroup rgOptions;
-    @BindView(R2.id.tv_title)
-    TextView tvTitle;
-    @BindView(R2.id.iv_save)
-    ImageView ivSave;
+    private Lw003V3ActivityDeviceInfoBinding mBind;
     private FragmentManager fragmentManager;
     private LoRaFragment loraFragment;
     private ScannerFragment scannerFragment;
@@ -97,14 +76,14 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw003_v3_activity_device_info);
-        ButterKnife.bind(this);
+        mBind = Lw003V3ActivityDeviceInfoBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         mDeviceType = getIntent().getIntExtra(AppConstants.EXTRA_KEY_DEVICE_TYPE, 0);
         fragmentManager = getFragmentManager();
         initFragment();
-        radioBtnLora.setChecked(true);
-        tvTitle.setText(R.string.title_lora_lw003_v3);
-        rgOptions.setOnCheckedChangeListener(this);
+        mBind.radioBtnLora.setChecked(true);
+        mBind.tvTitle.setText(R.string.title_lora_lw003_v3);
+        mBind.rgOptions.setOnCheckedChangeListener(this);
         EventBus.getDefault().register(this);
         mUploadMode = new ArrayList<>();
         mUploadMode.add("ABP");
@@ -135,7 +114,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             LoRaLW003V3MokoSupport.getInstance().enableBluetooth();
         } else {
             showSyncingProgressDialog();
-            frameContainer.postDelayed(() -> {
+            mBind.frameContainer.postDelayed(() -> {
                 List<OrderTask> orderTasks = new ArrayList<>();
                 // sync time after connect success;
                 orderTasks.add(OrderTaskAssembler.setTime());
@@ -492,7 +471,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     public void onSave(View view) {
         if (isWindowLocked())
             return;
-        if (radioBtnScanner.isChecked()) {
+        if (mBind.radioBtnScanner.isChecked()) {
             if (scannerFragment.isValid()) {
                 showSyncingProgressDialog();
                 scannerFragment.saveParams();
@@ -500,14 +479,14 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 ToastUtils.showToast(this,"Para error!");
             }
         }
-        if (radioBtnGeneral.isChecked()) {
+        if (mBind.radioBtnGeneral.isChecked()) {
             showSyncingProgressDialog();
             generalFragment.saveParams();
         }
     }
 
     private void back() {
-        frameContainer.postDelayed(() -> {
+        mBind.frameContainer.postDelayed(() -> {
             LoRaLW003V3MokoSupport.getInstance().disConnectBle();
         }, 500);
     }
@@ -533,8 +512,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     }
 
     private void showDeviceAndGetData() {
-        tvTitle.setText("Device Settings");
-        ivSave.setVisibility(View.GONE);
+        mBind.tvTitle.setText("Device Settings");
+        mBind.ivSave.setVisibility(View.GONE);
         fragmentManager.beginTransaction()
                 .hide(loraFragment)
                 .hide(scannerFragment)
@@ -551,8 +530,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     }
 
     private void showGeneralAndGetData() {
-        tvTitle.setText("General Settings");
-        ivSave.setVisibility(View.VISIBLE);
+        mBind.tvTitle.setText("General Settings");
+        mBind.ivSave.setVisibility(View.VISIBLE);
         fragmentManager.beginTransaction()
                 .hide(loraFragment)
                 .hide(scannerFragment)
@@ -564,8 +543,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     }
 
     private void showScannerAndGetData() {
-        tvTitle.setText("Bluetooth Gateway Settings");
-        ivSave.setVisibility(View.VISIBLE);
+        mBind.tvTitle.setText("Bluetooth Gateway Settings");
+        mBind.ivSave.setVisibility(View.VISIBLE);
         fragmentManager.beginTransaction()
                 .hide(loraFragment)
                 .show(scannerFragment)
@@ -582,8 +561,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     }
 
     private void showLoRaAndGetData() {
-        tvTitle.setText(R.string.title_lora_lw003_v3);
-        ivSave.setVisibility(View.GONE);
+        mBind.tvTitle.setText(R.string.title_lora_lw003_v3);
+        mBind.ivSave.setVisibility(View.GONE);
         fragmentManager.beginTransaction()
                 .show(loraFragment)
                 .hide(scannerFragment)
@@ -628,7 +607,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     private final ActivityResultLauncher<Intent> startLoRaConnSetting = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), callback -> {
         if (callback != null && callback.getResultCode() == RESULT_OK) {
             showSyncingProgressDialog();
-            ivSave.postDelayed(() -> {
+            mBind.ivSave.postDelayed(() -> {
                 List<OrderTask> orderTasks = new ArrayList<>();
                 // setting
                 orderTasks.add(OrderTaskAssembler.getLoraRegion());

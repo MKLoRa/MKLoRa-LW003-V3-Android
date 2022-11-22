@@ -6,32 +6,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.lw003v3.R;
-import com.moko.lw003v3.R2;
 import com.moko.lw003v3.activity.DeviceInfoActivity;
+import com.moko.lw003v3.databinding.Lw003V3FragmentDeviceBinding;
 import com.moko.lw003v3.dialog.BottomDialog;
 import com.moko.support.lw003v3.LoRaLW003V3MokoSupport;
 import com.moko.support.lw003v3.OrderTaskAssembler;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class DeviceFragment extends Fragment {
     private static final String TAG = DeviceFragment.class.getSimpleName();
-    @BindView(R2.id.tv_time_zone)
-    TextView tvTimeZone;
-    @BindView(R2.id.tv_low_power_prompt)
-    TextView tvLowPowerPrompt;
-    @BindView(R2.id.tv_low_power_prompt_tips)
-    TextView tvLowPowerPromptTips;
-    @BindView(R2.id.iv_low_power_payload)
-    ImageView ivLowPowerPayload;
+
+    private Lw003V3FragmentDeviceBinding mBind;
 
     private ArrayList<String> mTimeZones;
     private int mSelectedTimeZone;
@@ -55,8 +44,7 @@ public class DeviceFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        View view = inflater.inflate(R.layout.lw003_v3_fragment_device, container, false);
-        ButterKnife.bind(this, view);
+        mBind = Lw003V3FragmentDeviceBinding.inflate(inflater, container, false);
         activity = (DeviceInfoActivity) getActivity();
         mTimeZones = new ArrayList<>();
         for (int i = -24; i <= 28; i++) {
@@ -82,12 +70,12 @@ public class DeviceFragment extends Fragment {
         mLowPowerPrompts.add("30%");
         mLowPowerPrompts.add("40%");
         mLowPowerPrompts.add("50%");
-        return view;
+        return mBind.getRoot();
     }
 
     public void setTimeZone(int timeZone) {
         mSelectedTimeZone = timeZone + 24;
-        tvTimeZone.setText(mTimeZones.get(mSelectedTimeZone));
+        mBind.tvTimeZone.setText(mTimeZones.get(mSelectedTimeZone));
     }
 
     public void showTimeZoneDialog() {
@@ -95,7 +83,7 @@ public class DeviceFragment extends Fragment {
         dialog.setDatas(mTimeZones, mSelectedTimeZone);
         dialog.setListener(value -> {
             mSelectedTimeZone = value;
-            tvTimeZone.setText(mTimeZones.get(value));
+            mBind.tvTimeZone.setText(mTimeZones.get(value));
             activity.showSyncingProgressDialog();
             ArrayList<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.setTimeZone(value - 24));
@@ -107,13 +95,13 @@ public class DeviceFragment extends Fragment {
 
     public void setLowPowerPayload(int enable) {
         mLowPowerPayloadEnable = enable == 1;
-        ivLowPowerPayload.setImageResource(mLowPowerPayloadEnable ? R.drawable.lw003_v3_ic_checked : R.drawable.lw003_v3_ic_unchecked);
+        mBind.ivLowPowerPayload.setImageResource(mLowPowerPayloadEnable ? R.drawable.lw003_v3_ic_checked : R.drawable.lw003_v3_ic_unchecked);
     }
 
     public void setLowPower(int lowPower) {
         mSelectedLowPowerPrompt = lowPower;
-        tvLowPowerPrompt.setText(mLowPowerPrompts.get(mSelectedLowPowerPrompt));
-        tvLowPowerPromptTips.setText(getString(R.string.lw003_v3_low_power_prompt_tips, mLowPowerPrompts.get(mSelectedLowPowerPrompt)));
+        mBind.tvLowPowerPrompt.setText(mLowPowerPrompts.get(mSelectedLowPowerPrompt));
+        mBind.tvLowPowerPromptTips.setText(getString(R.string.lw003_v3_low_power_prompt_tips, mLowPowerPrompts.get(mSelectedLowPowerPrompt)));
     }
 
 
@@ -131,8 +119,8 @@ public class DeviceFragment extends Fragment {
         dialog.setDatas(mLowPowerPrompts, mSelectedLowPowerPrompt);
         dialog.setListener(value -> {
             mSelectedLowPowerPrompt = value;
-            tvLowPowerPrompt.setText(mLowPowerPrompts.get(value));
-            tvLowPowerPromptTips.setText(getString(R.string.lw003_v3_low_power_prompt_tips, mLowPowerPrompts.get(value)));
+            mBind.tvLowPowerPrompt.setText(mLowPowerPrompts.get(value));
+            mBind.tvLowPowerPromptTips.setText(getString(R.string.lw003_v3_low_power_prompt_tips, mLowPowerPrompts.get(value)));
             activity.showSyncingProgressDialog();
             ArrayList<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.setLowPowerPercent(value));

@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -17,7 +16,7 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.lw003v3.R;
-import com.moko.lw003v3.R2;
+import com.moko.lw003v3.databinding.Lw003V3ActivityBluetoothFilterSettingsBinding;
 import com.moko.lw003v3.dialog.BottomDialog;
 import com.moko.lw003v3.dialog.LoadingMessageDialog;
 import com.moko.lw003v3.utils.ToastUtils;
@@ -33,24 +32,9 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class BluetoothFilterSettingsActivity extends BaseActivity implements SeekBar.OnSeekBarChangeListener {
 
-
-    @BindView(R2.id.sb_rssi_filter)
-    SeekBar sbRssiFilter;
-    @BindView(R2.id.tv_rssi_filter_value)
-    TextView tvRssiFilterValue;
-    @BindView(R2.id.tv_rssi_filter_tips)
-    TextView tvRssiFilterTips;
-    @BindView(R2.id.tv_scanning_type)
-    TextView tvScanningType;
-    @BindView(R2.id.tv_filter_relationship)
-    TextView tvFilterRelationship;
-    @BindView(R2.id.tv_duplicate_data_filter)
-    TextView tvDuplicateDataFilter;
+    private Lw003V3ActivityBluetoothFilterSettingsBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
     private ArrayList<String> mRelationshipValues;
@@ -63,8 +47,8 @@ public class BluetoothFilterSettingsActivity extends BaseActivity implements See
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw003_v3_activity_bluetooth_filter_settings);
-        ButterKnife.bind(this);
+        mBind = Lw003V3ActivityBluetoothFilterSettingsBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
 
         mRelationshipValues = new ArrayList<>();
@@ -85,14 +69,14 @@ public class BluetoothFilterSettingsActivity extends BaseActivity implements See
         mDuplicateDataFilterValues.add("MAC");
         mDuplicateDataFilterValues.add("MAC+Data Type");
         mDuplicateDataFilterValues.add("MAC+Raw Data");
-        sbRssiFilter.setOnSeekBarChangeListener(this);
+        mBind.sbRssiFilter.setOnSeekBarChangeListener(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
         showSyncingProgressDialog();
-        sbRssiFilter.postDelayed(() -> {
+        mBind.sbRssiFilter.postDelayed(() -> {
             List<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.getFilterRSSI());
             orderTasks.add(OrderTaskAssembler.getFilterBleScanPhy());
@@ -171,29 +155,29 @@ public class BluetoothFilterSettingsActivity extends BaseActivity implements See
                                         if (length > 0) {
                                             final int rssi = value[4];
                                             int progress = rssi + 127;
-                                            sbRssiFilter.setProgress(progress);
-                                            tvRssiFilterTips.setText(getString(R.string.rssi_filter, rssi));
+                                            mBind.sbRssiFilter.setProgress(progress);
+                                            mBind.tvRssiFilterTips.setText(getString(R.string.rssi_filter, rssi));
                                         }
                                         break;
                                     case KEY_FILTER_BLE_SCAN_PHY:
                                         if (length > 0) {
                                             int type = value[4] & 0xFF;
                                             mScanningTypeSelected = type;
-                                            tvScanningType.setText(mScanningTypeValues.get(type));
+                                            mBind.tvScanningType.setText(mScanningTypeValues.get(type));
                                         }
                                         break;
                                     case KEY_FILTER_RELATIONSHIP:
                                         if (length > 0) {
                                             int relationship = value[4] & 0xFF;
                                             mRelationshipSelected = relationship;
-                                            tvFilterRelationship.setText(mRelationshipValues.get(relationship));
+                                            mBind.tvFilterRelationship.setText(mRelationshipValues.get(relationship));
                                         }
                                         break;
                                     case KEY_FILTER_DUPLICATE_DATA:
                                         if (length > 0) {
                                             int duplicateData = value[4] & 0xFF;
                                             mDuplicateDataFilterSelected = duplicateData;
-                                            tvDuplicateDataFilter.setText(mDuplicateDataFilterValues.get(duplicateData));
+                                            mBind.tvDuplicateDataFilter.setText(mDuplicateDataFilterValues.get(duplicateData));
                                         }
                                         break;
                                 }
@@ -211,7 +195,7 @@ public class BluetoothFilterSettingsActivity extends BaseActivity implements See
         showSyncingProgressDialog();
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.setFilterRSSI(sbRssiFilter.getProgress() - 127));
+        orderTasks.add(OrderTaskAssembler.setFilterRSSI(mBind.sbRssiFilter.getProgress() - 127));
         orderTasks.add(OrderTaskAssembler.setFilterBleScanPhy(mScanningTypeSelected));
         orderTasks.add(OrderTaskAssembler.setFilterRelationship(mRelationshipSelected));
         orderTasks.add(OrderTaskAssembler.setFilterDuplicateData(mDuplicateDataFilterSelected));
@@ -285,7 +269,7 @@ public class BluetoothFilterSettingsActivity extends BaseActivity implements See
         dialog.setDatas(mDuplicateDataFilterValues, mDuplicateDataFilterSelected);
         dialog.setListener(value -> {
             mDuplicateDataFilterSelected = value;
-            tvDuplicateDataFilter.setText(mDuplicateDataFilterValues.get(value));
+            mBind.tvDuplicateDataFilter.setText(mDuplicateDataFilterValues.get(value));
         });
         dialog.show(getSupportFragmentManager());
     }
@@ -297,7 +281,7 @@ public class BluetoothFilterSettingsActivity extends BaseActivity implements See
         dialog.setDatas(mScanningTypeValues, mScanningTypeSelected);
         dialog.setListener(value -> {
             mScanningTypeSelected = value;
-            tvScanningType.setText(mScanningTypeValues.get(value));
+            mBind.tvScanningType.setText(mScanningTypeValues.get(value));
         });
         dialog.show(getSupportFragmentManager());
     }
@@ -309,7 +293,7 @@ public class BluetoothFilterSettingsActivity extends BaseActivity implements See
         dialog.setDatas(mRelationshipValues, mRelationshipSelected);
         dialog.setListener(value -> {
             mRelationshipSelected = value;
-            tvFilterRelationship.setText(mRelationshipValues.get(value));
+            mBind.tvFilterRelationship.setText(mRelationshipValues.get(value));
         });
         dialog.show(getSupportFragmentManager());
     }
@@ -338,8 +322,8 @@ public class BluetoothFilterSettingsActivity extends BaseActivity implements See
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
         int rssi = progress - 127;
-        tvRssiFilterValue.setText(String.format("%ddBm", rssi));
-        tvRssiFilterTips.setText(getString(R.string.rssi_filter, rssi));
+        mBind.tvRssiFilterValue.setText(String.format("%ddBm", rssi));
+        mBind.tvRssiFilterTips.setText(getString(R.string.rssi_filter, rssi));
     }
 
     @Override

@@ -5,9 +5,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.moko.ble.lib.MokoConstants;
@@ -17,7 +15,7 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.lw003v3.R;
-import com.moko.lw003v3.R2;
+import com.moko.lw003v3.databinding.Lw003V3ActivityFilterOtherBinding;
 import com.moko.lw003v3.dialog.BottomDialog;
 import com.moko.lw003v3.dialog.LoadingMessageDialog;
 import com.moko.lw003v3.utils.ToastUtils;
@@ -34,23 +32,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class FilterOtherActivity extends BaseActivity {
 
-    @BindView(R2.id.cb_other)
-    CheckBox cbOther;
-    @BindView(R2.id.ll_filter_condition)
-    LinearLayout llFilterCondition;
-    @BindView(R2.id.tv_other_relationship)
-    TextView tvOtherRelationship;
-    @BindView(R2.id.cl_other_relationship)
-    ConstraintLayout clOtherRelationship;
+    private Lw003V3ActivityFilterOtherBinding mBind;
     private boolean savedParamsError;
-
-
     private ArrayList<String> filterOther;
 
     private ArrayList<String> mValues;
@@ -59,13 +44,13 @@ public class FilterOtherActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw003_v3_activity_filter_other);
-        ButterKnife.bind(this);
+        mBind = Lw003V3ActivityFilterOtherBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
 
         filterOther = new ArrayList<>();
         showSyncingProgressDialog();
-        cbOther.postDelayed(() -> {
+        mBind.cbOther.postDelayed(() -> {
             List<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.getFilterOtherEnable());
             orderTasks.add(OrderTaskAssembler.getFilterOtherRelationship());
@@ -158,7 +143,7 @@ public class FilterOtherActivity extends BaseActivity {
                                                 mValues.add("A | B | C");
                                                 mSelected = relationship - 3;
                                             }
-                                            tvOtherRelationship.setText(mValues.get(mSelected));
+                                            mBind.tvOtherRelationship.setText(mValues.get(mSelected));
                                         }
                                         break;
                                     case KEY_FILTER_OTHER_RULES:
@@ -173,7 +158,7 @@ public class FilterOtherActivity extends BaseActivity {
                                             }
                                             for (int i = 0, l = filterOther.size(); i < l; i++) {
                                                 String other = filterOther.get(i);
-                                                View v = LayoutInflater.from(this).inflate(R.layout.lw003_v3_item_other_filter, llFilterCondition, false);
+                                                View v = LayoutInflater.from(this).inflate(R.layout.lw003_v3_item_other_filter, mBind.llFilterCondition, false);
                                                 TextView tvCondition = v.findViewById(R.id.tv_condition);
                                                 EditText etDataType = v.findViewById(R.id.et_data_type);
                                                 EditText etMin = v.findViewById(R.id.et_min);
@@ -194,17 +179,17 @@ public class FilterOtherActivity extends BaseActivity {
                                                 etMin.setText(String.valueOf(Integer.parseInt(other.substring(2, 4), 16)));
                                                 etMax.setText(String.valueOf(Integer.parseInt(other.substring(4, 6), 16)));
                                                 etRawData.setText(other.substring(6));
-                                                llFilterCondition.addView(v);
+                                                mBind.llFilterCondition.addView(v);
                                             }
                                             if (filterOther.size() > 0)
-                                                clOtherRelationship.setVisibility(View.VISIBLE);
+                                                mBind.clOtherRelationship.setVisibility(View.VISIBLE);
                                         }
                                         break;
 
                                     case KEY_FILTER_OTHER_ENABLE:
                                         if (length > 0) {
                                             int enable = value[4] & 0xFF;
-                                            cbOther.setChecked(enable == 1);
+                                            mBind.cbOther.setChecked(enable == 1);
                                         }
                                         break;
                                 }
@@ -228,12 +213,12 @@ public class FilterOtherActivity extends BaseActivity {
     }
 
     private boolean isValid() {
-        final int count = llFilterCondition.getChildCount();
+        final int count = mBind.llFilterCondition.getChildCount();
         if (count > 0) {
             // 发送设置的过滤RawData
             filterOther.clear();
             for (int i = 0; i < count; i++) {
-                View v = llFilterCondition.getChildAt(i);
+                View v = mBind.llFilterCondition.getChildAt(i);
                 EditText etDataType = v.findViewById(R.id.et_data_type);
                 EditText etMin = v.findViewById(R.id.et_min);
                 EditText etMax = v.findViewById(R.id.et_max);
@@ -312,19 +297,19 @@ public class FilterOtherActivity extends BaseActivity {
             relationship = mSelected + 3;
         }
         orderTasks.add(OrderTaskAssembler.setFilterOtherRelationship(relationship));
-        orderTasks.add(OrderTaskAssembler.setFilterOtherEnable(cbOther.isChecked() ? 1 : 0));
+        orderTasks.add(OrderTaskAssembler.setFilterOtherEnable(mBind.cbOther.isChecked() ? 1 : 0));
         LoRaLW003V3MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     public void onAdd(View view) {
         if (isWindowLocked())
             return;
-        int count = llFilterCondition.getChildCount();
+        int count = mBind.llFilterCondition.getChildCount();
         if (count > 2) {
             ToastUtils.showToast(this, "You can set up to 3 filters!");
             return;
         }
-        View v = LayoutInflater.from(this).inflate(R.layout.lw003_v3_item_other_filter, llFilterCondition, false);
+        View v = LayoutInflater.from(this).inflate(R.layout.lw003_v3_item_other_filter, mBind.llFilterCondition, false);
         TextView tvCondition = v.findViewById(R.id.tv_condition);
         if (count == 0) {
             tvCondition.setText("Condition A");
@@ -333,8 +318,8 @@ public class FilterOtherActivity extends BaseActivity {
         } else {
             tvCondition.setText("Condition C");
         }
-        llFilterCondition.addView(v);
-        clOtherRelationship.setVisibility(View.VISIBLE);
+        mBind.llFilterCondition.addView(v);
+        mBind.clOtherRelationship.setVisibility(View.VISIBLE);
         mValues = new ArrayList<>();
         if (count == 0) {
             mValues.add("A");
@@ -351,23 +336,23 @@ public class FilterOtherActivity extends BaseActivity {
             mValues.add("A | B | C");
             mSelected = 2;
         }
-        tvOtherRelationship.setText(mValues.get(mSelected));
+        mBind.tvOtherRelationship.setText(mValues.get(mSelected));
     }
 
     public void onDel(View view) {
         if (isWindowLocked())
             return;
-        final int c = llFilterCondition.getChildCount();
+        final int c = mBind.llFilterCondition.getChildCount();
         if (c == 0) {
             ToastUtils.showToast(this, "There are currently no filters to delete");
             return;
         }
-        int count = llFilterCondition.getChildCount();
+        int count = mBind.llFilterCondition.getChildCount();
         if (count > 0) {
-            llFilterCondition.removeViewAt(count - 1);
+            mBind.llFilterCondition.removeViewAt(count - 1);
             mValues = new ArrayList<>();
             if (count == 1) {
-                clOtherRelationship.setVisibility(View.GONE);
+                mBind.clOtherRelationship.setVisibility(View.GONE);
                 return;
             }
             if (count == 2) {
@@ -379,7 +364,7 @@ public class FilterOtherActivity extends BaseActivity {
                 mValues.add("A | B");
                 mSelected = 1;
             }
-            tvOtherRelationship.setText(mValues.get(mSelected));
+            mBind.tvOtherRelationship.setText(mValues.get(mSelected));
         }
     }
 
@@ -425,7 +410,7 @@ public class FilterOtherActivity extends BaseActivity {
         dialog.setDatas(mValues, mSelected);
         dialog.setListener(value -> {
             mSelected = value;
-            tvOtherRelationship.setText(mValues.get(value));
+            mBind.tvOtherRelationship.setText(mValues.get(value));
         });
         dialog.show(getSupportFragmentManager());
     }

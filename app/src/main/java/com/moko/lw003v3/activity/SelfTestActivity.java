@@ -3,15 +3,13 @@ package com.moko.lw003v3.activity;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.lw003v3.R;
-import com.moko.lw003v3.R2;
+import com.moko.lw003v3.databinding.Lw003V3ActivitySelftestBinding;
 import com.moko.lw003v3.dialog.AlertMessageDialog;
 import com.moko.lw003v3.dialog.LoadingMessageDialog;
 import com.moko.lw003v3.utils.ToastUtils;
@@ -27,30 +25,18 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class SelfTestActivity extends BaseActivity {
 
-    @BindView(R2.id.tv_selftest_status)
-    TextView tvSelftestStatus;
-    @BindView(R2.id.tv_flash_status)
-    TextView tvFlashStatus;
-    @BindView(R2.id.tv_axis_status)
-    TextView tvAxisStatus;
-    @BindView(R2.id.tv_gps_status)
-    TextView tvGpsStatus;
-    @BindView(R2.id.tv_pcba_status)
-    TextView tvPcbaStatus;
+    private Lw003V3ActivitySelftestBinding mBind;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw003_v3_activity_selftest);
-        ButterKnife.bind(this);
+        mBind = Lw003V3ActivitySelftestBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         showSyncingProgressDialog();
-        tvSelftestStatus.postDelayed(() -> {
+        mBind.tvSelftestStatus.postDelayed(() -> {
             List<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.getSelfTestStatus());
             orderTasks.add(OrderTaskAssembler.getPCBAStatus());
@@ -103,18 +89,18 @@ public class SelfTestActivity extends BaseActivity {
                                     case KEY_SELFTEST_STATUS:
                                         if (length > 0) {
                                             int status = value[4] & 0xFF;
-                                            tvSelftestStatus.setVisibility(status == 0 ? View.VISIBLE : View.GONE);
+                                            mBind.tvSelftestStatus.setVisibility(status == 0 ? View.VISIBLE : View.GONE);
                                             if ((status & 0x01) == 0x01)
-                                                tvGpsStatus.setVisibility(View.VISIBLE);
+                                                mBind.tvGpsStatus.setVisibility(View.VISIBLE);
                                             if ((status & 0x02) == 0x02)
-                                                tvAxisStatus.setVisibility(View.VISIBLE);
+                                                mBind.tvAxisStatus.setVisibility(View.VISIBLE);
                                             if ((status & 0x04) == 0x04)
-                                                tvFlashStatus.setVisibility(View.VISIBLE);
+                                                mBind.tvFlashStatus.setVisibility(View.VISIBLE);
                                         }
                                         break;
                                     case KEY_PCBA_STATUS:
                                         if (length > 0) {
-                                            tvPcbaStatus.setText(String.valueOf(value[4] & 0xFF));
+                                            mBind.tvPcbaStatus.setText(String.valueOf(value[4] & 0xFF));
                                         }
                                         break;
                                 }

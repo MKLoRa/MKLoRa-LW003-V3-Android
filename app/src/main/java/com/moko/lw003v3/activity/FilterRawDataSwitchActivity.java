@@ -4,8 +4,6 @@ package com.moko.lw003v3.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -13,7 +11,7 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.lw003v3.R;
-import com.moko.lw003v3.R2;
+import com.moko.lw003v3.databinding.Lw003V3ActivityFilterRawDataSwitchBinding;
 import com.moko.lw003v3.dialog.LoadingMessageDialog;
 import com.moko.lw003v3.utils.ToastUtils;
 import com.moko.support.lw003v3.LoRaLW003V3MokoSupport;
@@ -30,34 +28,10 @@ import java.util.List;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class FilterRawDataSwitchActivity extends BaseActivity {
 
-
-    @BindView(R2.id.tv_filter_by_ibeacon)
-    TextView tvFilterByIbeacon;
-    @BindView(R2.id.tv_filter_by_uid)
-    TextView tvFilterByUid;
-    @BindView(R2.id.tv_filter_by_url)
-    TextView tvFilterByUrl;
-    @BindView(R2.id.tv_filter_by_tlm)
-    TextView tvFilterByTlm;
-    @BindView(R2.id.tv_filter_by_bxp_ibeacon)
-    TextView tvFilterByBXPibeacon;
-    @BindView(R2.id.iv_filter_by_bxp_device)
-    ImageView ivFilterByBxpDevice;
-    @BindView(R2.id.iv_filter_by_bxp_acc)
-    ImageView ivFilterByBxpAcc;
-    @BindView(R2.id.iv_filter_by_bxp_th)
-    ImageView ivFilterByBxpTh;
-    @BindView(R2.id.tv_filter_by_bxp_button)
-    TextView tvFilterByBXPButton;
-    @BindView(R2.id.tv_filter_by_bxp_tag)
-    TextView tvFilterByBXPTag;
-    @BindView(R2.id.tv_filter_by_other)
-    TextView tvFilterByOther;
+    private Lw003V3ActivityFilterRawDataSwitchBinding mBind;
     private boolean savedParamsError;
 
     private boolean isBXPDeviceOpen;
@@ -67,11 +41,11 @@ public class FilterRawDataSwitchActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw003_v3_activity_filter_raw_data_switch);
-        ButterKnife.bind(this);
+        mBind = Lw003V3ActivityFilterRawDataSwitchBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         showSyncingProgressDialog();
-        tvFilterByIbeacon.postDelayed(() -> {
+        mBind.tvFilterByIbeacon.postDelayed(() -> {
             List<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.getFilterRawData());
             LoRaLW003V3MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
@@ -141,17 +115,17 @@ public class FilterRawDataSwitchActivity extends BaseActivity {
                                     case KEY_FILTER_RAW_DATA:
                                         if (length == 11) {
                                             dismissSyncProgressDialog();
-                                            tvFilterByIbeacon.setText(value[4] == 1 ? "ON" : "OFF");
-                                            tvFilterByUid.setText(value[5] == 1 ? "ON" : "OFF");
-                                            tvFilterByUrl.setText(value[6] == 1 ? "ON" : "OFF");
-                                            tvFilterByTlm.setText(value[7] == 1 ? "ON" : "OFF");
-                                            tvFilterByBXPibeacon.setText(value[8] == 1 ? "ON" : "OFF");
-                                            ivFilterByBxpDevice.setImageResource(value[9] == 1 ? R.drawable.lw003_v3_ic_checked : R.drawable.lw003_v3_ic_unchecked);
-                                            ivFilterByBxpAcc.setImageResource(value[10] == 1 ? R.drawable.lw003_v3_ic_checked : R.drawable.lw003_v3_ic_unchecked);
-                                            ivFilterByBxpTh.setImageResource(value[11] == 1 ? R.drawable.lw003_v3_ic_checked : R.drawable.lw003_v3_ic_unchecked);
-                                            tvFilterByBXPButton.setText(value[12] == 1 ? "ON" : "OFF");
-                                            tvFilterByBXPTag.setText(value[13] == 1 ? "ON" : "OFF");
-                                            tvFilterByOther.setText(value[14] == 1 ? "ON" : "OFF");
+                                            mBind.tvFilterByIbeacon.setText(value[4] == 1 ? "ON" : "OFF");
+                                            mBind.tvFilterByUid.setText(value[5] == 1 ? "ON" : "OFF");
+                                            mBind.tvFilterByUrl.setText(value[6] == 1 ? "ON" : "OFF");
+                                            mBind.tvFilterByTlm.setText(value[7] == 1 ? "ON" : "OFF");
+                                            mBind.tvFilterByBxpIbeacon.setText(value[8] == 1 ? "ON" : "OFF");
+                                            mBind.ivFilterByBxpDevice.setImageResource(value[9] == 1 ? R.drawable.lw003_v3_ic_checked : R.drawable.lw003_v3_ic_unchecked);
+                                            mBind.ivFilterByBxpAcc.setImageResource(value[10] == 1 ? R.drawable.lw003_v3_ic_checked : R.drawable.lw003_v3_ic_unchecked);
+                                            mBind.ivFilterByBxpTh.setImageResource(value[11] == 1 ? R.drawable.lw003_v3_ic_checked : R.drawable.lw003_v3_ic_unchecked);
+                                            mBind.tvFilterByBxpButton.setText(value[12] == 1 ? "ON" : "OFF");
+                                            mBind.tvFilterByBxpTag.setText(value[13] == 1 ? "ON" : "OFF");
+                                            mBind.tvFilterByOther.setText(value[14] == 1 ? "ON" : "OFF");
                                             isBXPDeviceOpen = value[9] == 1;
                                             isBXPAccOpen = value[10] == 1;
                                             isBXPTHOpen = value[11] == 1;
@@ -300,7 +274,7 @@ public class FilterRawDataSwitchActivity extends BaseActivity {
     private final ActivityResultLauncher<Intent> startFilterRawData = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), callback -> {
         if (callback != null && callback.getResultCode() == RESULT_OK) {
             showSyncingProgressDialog();
-            tvFilterByIbeacon.postDelayed(() -> {
+            mBind.tvFilterByIbeacon.postDelayed(() -> {
                 List<OrderTask> orderTasks = new ArrayList<>();
                 orderTasks.add(OrderTaskAssembler.getFilterRawData());
                 LoRaLW003V3MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));

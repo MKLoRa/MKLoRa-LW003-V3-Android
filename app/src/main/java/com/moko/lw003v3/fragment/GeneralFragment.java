@@ -6,22 +6,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 
-import com.moko.lw003v3.R;
-import com.moko.lw003v3.R2;
 import com.moko.lw003v3.activity.DeviceInfoActivity;
+import com.moko.lw003v3.databinding.Lw003V3FragmentGeneralBinding;
 import com.moko.support.lw003v3.LoRaLW003V3MokoSupport;
 import com.moko.support.lw003v3.OrderTaskAssembler;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class GeneralFragment extends Fragment {
     private static final String TAG = GeneralFragment.class.getSimpleName();
-    @BindView(R2.id.cb_continuity_transfer_function)
-    CheckBox cbContinuityTransferFunction;
 
+    private Lw003V3FragmentGeneralBinding mBind;
 
     private DeviceInfoActivity activity;
 
@@ -38,18 +32,17 @@ public class GeneralFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        View view = inflater.inflate(R.layout.lw003_v3_fragment_general, container, false);
-        ButterKnife.bind(this, view);
+        mBind = Lw003V3FragmentGeneralBinding.inflate(inflater, container, false);
         activity = (DeviceInfoActivity) getActivity();
-        return view;
+        return mBind.getRoot();
     }
 
     public void saveParams() {
-        final int enable = cbContinuityTransferFunction.isChecked() ? 1 : 0;
+        final int enable = mBind.cbContinuityTransferFunction.isChecked() ? 1 : 0;
         LoRaLW003V3MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setContinuityTransferFunctionEnable(enable));
     }
 
     public void setEnable(int enable) {
-        cbContinuityTransferFunction.setChecked(enable == 1);
+        mBind.cbContinuityTransferFunction.setChecked(enable == 1);
     }
 }

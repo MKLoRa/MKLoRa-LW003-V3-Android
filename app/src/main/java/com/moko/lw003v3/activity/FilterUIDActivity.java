@@ -4,8 +4,6 @@ package com.moko.lw003v3.activity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.EditText;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -13,8 +11,7 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.lw003v3.R;
-import com.moko.lw003v3.R2;
+import com.moko.lw003v3.databinding.Lw003V3ActivityFilterUidBinding;
 import com.moko.lw003v3.dialog.LoadingMessageDialog;
 import com.moko.lw003v3.utils.ToastUtils;
 import com.moko.support.lw003v3.LoRaLW003V3MokoSupport;
@@ -30,29 +27,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class FilterUIDActivity extends BaseActivity {
 
+    private Lw003V3ActivityFilterUidBinding mBind;
 
-    @BindView(R2.id.cb_uid)
-    CheckBox cbUid;
-    @BindView(R2.id.et_uid_namespace)
-    EditText etUidNamespace;
-    @BindView(R2.id.et_uid_instance_id)
-    EditText etUidInstanceId;
     private boolean savedParamsError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw003_v3_activity_filter_uid);
-        ButterKnife.bind(this);
+        mBind = Lw003V3ActivityFilterUidBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
 
         showSyncingProgressDialog();
-        cbUid.postDelayed(() -> {
+        mBind.cbUid.postDelayed(() -> {
             List<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.getFilterEddystoneUidEnable());
             orderTasks.add(OrderTaskAssembler.getFilterEddystoneUidNamespace());
@@ -129,19 +118,19 @@ public class FilterUIDActivity extends BaseActivity {
                                     case KEY_FILTER_EDDYSTONE_UID_NAMESPACE:
                                         if (length > 0) {
                                             String uuid = MokoUtils.bytesToHexString(Arrays.copyOfRange(value, 4, 4 + length));
-                                            etUidNamespace.setText(String.valueOf(uuid));
+                                            mBind.etUidNamespace.setText(String.valueOf(uuid));
                                         }
                                         break;
                                     case KEY_FILTER_EDDYSTONE_UID_INSTANCE:
                                         if (length > 0) {
                                             String uuid = MokoUtils.bytesToHexString(Arrays.copyOfRange(value, 4, 4 + length));
-                                            etUidInstanceId.setText(String.valueOf(uuid));
+                                            mBind.etUidInstanceId.setText(String.valueOf(uuid));
                                         }
                                         break;
                                     case KEY_FILTER_EDDYSTONE_UID_ENABLE:
                                         if (length > 0) {
                                             int enable = value[4] & 0xFF;
-                                            cbUid.setChecked(enable == 1);
+                                            mBind.cbUid.setChecked(enable == 1);
                                         }
                                         break;
                                 }
@@ -165,8 +154,8 @@ public class FilterUIDActivity extends BaseActivity {
     }
 
     private boolean isValid() {
-        final String namespace = etUidNamespace.getText().toString();
-        final String instanceId = etUidInstanceId.getText().toString();
+        final String namespace = mBind.etUidNamespace.getText().toString();
+        final String instanceId = mBind.etUidInstanceId.getText().toString();
         if (!TextUtils.isEmpty(namespace)) {
             int length = namespace.length();
             if (length % 2 != 0) {
@@ -184,13 +173,13 @@ public class FilterUIDActivity extends BaseActivity {
 
 
     private void saveParams() {
-        final String namespace = etUidNamespace.getText().toString();
-        final String instanceId = etUidInstanceId.getText().toString();
+        final String namespace = mBind.etUidNamespace.getText().toString();
+        final String instanceId = mBind.etUidInstanceId.getText().toString();
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setFilterEddystoneUIDNamespace(namespace));
         orderTasks.add(OrderTaskAssembler.setFilterEddystoneUIDInstance(instanceId));
-        orderTasks.add(OrderTaskAssembler.setFilterEddystoneUIDEnable(cbUid.isChecked() ? 1 : 0));
+        orderTasks.add(OrderTaskAssembler.setFilterEddystoneUIDEnable(mBind.cbUid.isChecked() ? 1 : 0));
         LoRaLW003V3MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 

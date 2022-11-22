@@ -5,11 +5,7 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -17,7 +13,7 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.lw003v3.R;
-import com.moko.lw003v3.R2;
+import com.moko.lw003v3.databinding.Lw003V3ActivityBleSettingsBinding;
 import com.moko.lw003v3.dialog.ChangePasswordDialog;
 import com.moko.lw003v3.dialog.LoadingMessageDialog;
 import com.moko.lw003v3.entity.TxPowerEnum;
@@ -37,28 +33,10 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekBarChangeListener {
     private final String FILTER_ASCII = "[ -~]*";
 
-    @BindView(R2.id.et_adv_name)
-    EditText etAdvName;
-    @BindView(R2.id.et_adv_interval)
-    EditText etAdvInterval;
-    @BindView(R2.id.et_adv_timeout)
-    EditText etAdvTimeout;
-    @BindView(R2.id.cb_event_notify)
-    CheckBox cbEventNotify;
-    @BindView(R2.id.iv_login_mode)
-    ImageView ivLoginMode;
-    @BindView(R2.id.sb_tx_power)
-    SeekBar sbTxPower;
-    @BindView(R2.id.tv_tx_power_value)
-    TextView tvTxPowerValue;
-    @BindView(R2.id.tv_change_password)
-    TextView tvChangePassword;
+    private Lw003V3ActivityBleSettingsBinding mBind;
     private boolean savedParamsError;
     private boolean mPasswordVerifyEnable;
     private boolean mPasswordVerifyDisable;
@@ -66,8 +44,8 @@ public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekB
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw003_v3_activity_ble_settings);
-        ButterKnife.bind(this);
+        mBind = Lw003V3ActivityBleSettingsBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         InputFilter inputFilter = (source, start, end, dest, dstart, dend) -> {
             if (!(source + "").matches(FILTER_ASCII)) {
@@ -76,10 +54,10 @@ public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekB
 
             return null;
         };
-        etAdvName.setFilters(new InputFilter[]{new InputFilter.LengthFilter(16), inputFilter});
-        sbTxPower.setOnSeekBarChangeListener(this);
+        mBind.etAdvName.setFilters(new InputFilter[]{new InputFilter.LengthFilter(16), inputFilter});
+        mBind.sbTxPower.setOnSeekBarChangeListener(this);
         showSyncingProgressDialog();
-        etAdvName.postDelayed(() -> {
+        mBind.etAdvName.postDelayed(() -> {
             List<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.getAdvName());
             orderTasks.add(OrderTaskAssembler.getAdvInterval());
@@ -160,25 +138,25 @@ public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekB
                                 switch (configKeyEnum) {
                                     case KEY_ADV_NAME:
                                         if (length > 0) {
-                                            etAdvName.setText(new String(Arrays.copyOfRange(value, 4, 4 + length)));
+                                            mBind.etAdvName.setText(new String(Arrays.copyOfRange(value, 4, 4 + length)));
                                         }
                                         break;
                                     case KEY_ADV_INTERVAL:
                                         if (length > 0) {
                                             int interval = value[4] & 0xFF;
-                                            etAdvInterval.setText(String.valueOf(interval));
+                                            mBind.etAdvInterval.setText(String.valueOf(interval));
                                         }
                                         break;
                                     case KEY_ADV_TIMEOUT:
                                         if (length > 0) {
                                             int timeout = value[4] & 0xFF;
-                                            etAdvTimeout.setText(String.valueOf(timeout));
+                                            mBind.etAdvTimeout.setText(String.valueOf(timeout));
                                         }
                                         break;
                                     case KEY_BLE_EVENT_NOTIFY_ENABLE:
                                         if (length > 0) {
                                             int enable = value[4] & 0xFF;
-                                            cbEventNotify.setChecked(enable == 1);
+                                            mBind.cbEventNotify.setChecked(enable == 1);
                                         }
                                         break;
                                     case KEY_PASSWORD_VERIFY_ENABLE:
@@ -186,16 +164,16 @@ public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekB
                                             int enable = value[4] & 0xFF;
                                             mPasswordVerifyEnable = enable == 1;
                                             mPasswordVerifyDisable = enable == 0;
-                                            ivLoginMode.setImageResource(mPasswordVerifyEnable ? R.drawable.lw003_v3_ic_checked : R.drawable.lw003_v3_ic_unchecked);
-                                            tvChangePassword.setVisibility(mPasswordVerifyEnable ? View.VISIBLE : View.GONE);
+                                            mBind.ivLoginMode.setImageResource(mPasswordVerifyEnable ? R.drawable.lw003_v3_ic_checked : R.drawable.lw003_v3_ic_unchecked);
+                                            mBind.tvChangePassword.setVisibility(mPasswordVerifyEnable ? View.VISIBLE : View.GONE);
                                         }
                                         break;
                                     case KEY_ADV_TX_POWER:
                                         if (length > 0) {
                                             int txPower = value[4];
                                             int progress = TxPowerEnum.fromTxPower(txPower).ordinal();
-                                            sbTxPower.setProgress(progress);
-                                            tvTxPowerValue.setText(String.format("%ddBm", txPower));
+                                            mBind.sbTxPower.setProgress(progress);
+                                            mBind.tvTxPowerValue.setText(String.format("%ddBm", txPower));
                                         }
                                         break;
                                 }
@@ -254,8 +232,8 @@ public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekB
     }
 
     private boolean isValid() {
-        final String advIntervalStr = etAdvInterval.getText().toString();
-        final String advTimeoutStr = etAdvTimeout.getText().toString();
+        final String advIntervalStr = mBind.etAdvInterval.getText().toString();
+        final String advTimeoutStr = mBind.etAdvTimeout.getText().toString();
         if (TextUtils.isEmpty(advIntervalStr) || TextUtils.isEmpty(advTimeoutStr))
             return false;
         final int timeout = Integer.parseInt(advTimeoutStr);
@@ -271,19 +249,19 @@ public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekB
 
 
     private void saveParams() {
-        final String advName = etAdvName.getText().toString();
-        final String advIntervalStr = etAdvInterval.getText().toString();
-        final String timeoutStr = etAdvTimeout.getText().toString();
+        final String advName = mBind.etAdvName.getText().toString();
+        final String advIntervalStr = mBind.etAdvInterval.getText().toString();
+        final String timeoutStr = mBind.etAdvTimeout.getText().toString();
         final int interval = Integer.parseInt(advIntervalStr);
         final int timeout = Integer.parseInt(timeoutStr);
-        final int progress = sbTxPower.getProgress();
+        final int progress = mBind.sbTxPower.getProgress();
         TxPowerEnum txPowerEnum = TxPowerEnum.fromOrdinal(progress);
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setAdvName(advName));
         orderTasks.add(OrderTaskAssembler.setAdvInterval(interval));
         orderTasks.add(OrderTaskAssembler.setAdvTimeout(timeout));
-        orderTasks.add(OrderTaskAssembler.setBleEventNotifyEnable(cbEventNotify.isChecked() ? 1 : 0));
+        orderTasks.add(OrderTaskAssembler.setBleEventNotifyEnable(mBind.cbEventNotify.isChecked() ? 1 : 0));
         if (txPowerEnum != null) {
             orderTasks.add(OrderTaskAssembler.setAdvTxPower(txPowerEnum.getTxPower()));
         }
@@ -316,8 +294,8 @@ public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekB
         if (isWindowLocked())
             return;
         mPasswordVerifyEnable = !mPasswordVerifyEnable;
-        ivLoginMode.setImageResource(mPasswordVerifyEnable ? R.drawable.lw003_v3_ic_checked : R.drawable.lw003_v3_ic_unchecked);
-        tvChangePassword.setVisibility(mPasswordVerifyEnable ? View.VISIBLE : View.GONE);
+        mBind.ivLoginMode.setImageResource(mPasswordVerifyEnable ? R.drawable.lw003_v3_ic_checked : R.drawable.lw003_v3_ic_unchecked);
+        mBind.tvChangePassword.setVisibility(mPasswordVerifyEnable ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -326,7 +304,7 @@ public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekB
         if (txPowerEnum == null)
             return;
         int txPower = txPowerEnum.getTxPower();
-        tvTxPowerValue.setText(String.format("%ddBm", txPower));
+        mBind.tvTxPowerValue.setText(String.format("%ddBm", txPower));
     }
 
     @Override
