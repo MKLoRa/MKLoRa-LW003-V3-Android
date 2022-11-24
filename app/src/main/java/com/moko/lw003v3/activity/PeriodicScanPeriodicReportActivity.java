@@ -219,7 +219,7 @@ public class PeriodicScanPeriodicReportActivity extends BaseActivity {
             return;
         }
         if (interval < duration) {
-            ToastUtils.showToast(this, "Para error!");
+            ToastUtils.showToast(this, "Bluetooth scan interval shouldn't be less than Bluetooth scan duration");
             return;
         }
         final int reportInterval = Integer.parseInt(reportIntervalStr);
@@ -228,7 +228,7 @@ public class PeriodicScanPeriodicReportActivity extends BaseActivity {
             return;
         }
         if (reportInterval < interval) {
-            ToastUtils.showToast(this, "Para error!");
+            ToastUtils.showToast(this, "Report interval shouldn't be less than Bluetooth scan interval");
             return;
         }
         showSyncingProgressDialog();

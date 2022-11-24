@@ -222,29 +222,21 @@ public class PayloadOtherTypeContentActivity extends BaseActivity {
                 final String dataTypeStr = etDataType.getText().toString();
                 final String startStr = etStart.getText().toString();
                 final String endStr = etEnd.getText().toString();
-
                 final int dataType = TextUtils.isEmpty(dataTypeStr) ? 0 : Integer.parseInt(dataTypeStr, 16);
                 if (dataType < 0 || dataType > 0xFF)
                     return false;
-                int start = 1;
-                int end = 1;
-                if (dataType != 0) {
-                    if (!TextUtils.isEmpty(startStr))
-                        start = Integer.parseInt(startStr);
-                    if (!TextUtils.isEmpty(endStr))
-                        end = Integer.parseInt(endStr);
-                    if (start < 1 || start > 29) {
-                        return false;
-                    }
-                    if (end < 1 || end > 29) {
-                        return false;
-                    }
-                    if (end < start) {
-                        return false;
-                    }
-                } else {
-                    etStart.setText("1");
-                    etEnd.setText("1");
+                if (TextUtils.isEmpty(startStr) || TextUtils.isEmpty(endStr))
+                    return false;
+                int start = Integer.parseInt(startStr);
+                int end = Integer.parseInt(endStr);
+                if (start < 1 || start > 29) {
+                    return false;
+                }
+                if (end < 1 || end > 29) {
+                    return false;
+                }
+                if (end < start) {
+                    return false;
                 }
                 StringBuffer sb = new StringBuffer();
                 sb.append(MokoUtils.int2HexString(dataType));

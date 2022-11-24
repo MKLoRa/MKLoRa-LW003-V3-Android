@@ -251,6 +251,8 @@ public class SystemInfoActivity extends BaseActivity {
     public void onDebuggerMode(View view) {
         if (isWindowLocked())
             return;
+        if (TextUtils.isEmpty(mDeviceMac))
+            return;
         Intent intent = new Intent(this, LogDataActivity.class);
         intent.putExtra(AppConstants.EXTRA_KEY_DEVICE_MAC, mDeviceMac);
         startActivity(intent);

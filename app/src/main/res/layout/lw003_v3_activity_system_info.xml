@@ -87,15 +87,19 @@
                     app:layout_constraintTop_toBottomOf="@id/tv_software_version" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="40dp"
                     android:gravity="center_vertical"
+                    android:maxLines="2"
                     android:text="Firmware Version"
                     android:textColor="@color/lw003_v3_black_333333"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    app:layout_constraintBaseline_toBaselineOf="@id/tv_firmware_version"
-                    app:layout_constraintLeft_toLeftOf="parent" />
+                    app:layout_constraintBottom_toBottomOf="@id/tv_firmware_version"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/tv_firmware_version"
+                    app:layout_constraintTop_toTopOf="@id/tv_firmware_version" />
 
                 <TextView
                     android:id="@+id/tv_firmware_version"
@@ -297,7 +301,7 @@
                 android:padding="10dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cl_battery">
+                app:layout_constraintTop_toBottomOf="@id/cl_system">
 
                 <TextView
                     android:layout_width="wrap_content"

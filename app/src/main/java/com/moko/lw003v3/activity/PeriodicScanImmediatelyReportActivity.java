@@ -214,7 +214,7 @@ public class PeriodicScanImmediatelyReportActivity extends BaseActivity{
             return;
         }
         if (interval < duration) {
-            ToastUtils.showToast(this, "Para error!");
+            ToastUtils.showToast(this, "Bluetooth scan interval shouldn't be less than Bluetooth scan duration");
             return;
         }
         showSyncingProgressDialog();

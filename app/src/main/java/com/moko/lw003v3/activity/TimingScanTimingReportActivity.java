@@ -66,8 +66,8 @@ public class TimingScanTimingReportActivity extends BaseActivity implements Base
             mHourValues.add(String.format("%02d", i));
         }
         mMinValues = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            mMinValues.add(String.format("%02d", i * 15));
+        for (int i = 0; i < 6; i++) {
+            mMinValues.add(String.format("%02d", i * 10));
         }
         mScanTimePoints = new ArrayList<>();
         mReportTimePoints = new ArrayList<>();
@@ -76,9 +76,10 @@ public class TimingScanTimingReportActivity extends BaseActivity implements Base
         ItemDragAndSwipeCallback scanItemDragAndSwipeCallback = new ItemDragAndSwipeCallback(mScanAdapter);
         ItemTouchHelper scanItemTouchHelper = new ItemTouchHelper(scanItemDragAndSwipeCallback);
         scanItemTouchHelper.attachToRecyclerView(mBind.rvScanTimePoint);
+
         ItemDragAndSwipeCallback reportItemDragAndSwipeCallback = new ItemDragAndSwipeCallback(mReportAdapter);
         ItemTouchHelper reportItemTouchHelper = new ItemTouchHelper(reportItemDragAndSwipeCallback);
-        reportItemTouchHelper.attachToRecyclerView(mBind.rvScanTimePoint);
+        reportItemTouchHelper.attachToRecyclerView(mBind.rvReportTimePoint);
 
         // 开启滑动删除
         mScanAdapter.enableSwipeItem();
@@ -234,7 +235,7 @@ public class TimingScanTimingReportActivity extends BaseActivity implements Base
                                         if (length > 0) {
                                             for (int i = 0; i < length; i++) {
                                                 int point = value[4 + i] & 0xFF;
-                                                int min = point * 15;
+                                                int min = point * 10;
                                                 int hour = min / 60;
                                                 min = min % 60;
                                                 TimePoint timePoint = new TimePoint();
@@ -254,7 +255,7 @@ public class TimingScanTimingReportActivity extends BaseActivity implements Base
                                         if (length > 0) {
                                             for (int i = 0; i < length; i++) {
                                                 int point = value[4 + i] & 0xFF;
-                                                int min = point * 15;
+                                                int min = point * 10;
                                                 int hour = min / 60;
                                                 min = min % 60;
                                                 TimePoint timePoint = new TimePoint();
@@ -356,7 +357,7 @@ public class TimingScanTimingReportActivity extends BaseActivity implements Base
             dialog.show(getSupportFragmentManager());
         }
         if (view.getId() == R.id.tv_point_min) {
-            int select = Integer.parseInt(timePoint.min) / 15;
+            int select = Integer.parseInt(timePoint.min) / 10;
             BottomDialog dialog = new BottomDialog();
             dialog.setDatas(mMinValues, select);
             dialog.setListener(value -> {
@@ -419,10 +420,10 @@ public class TimingScanTimingReportActivity extends BaseActivity implements Base
             int hour = Integer.parseInt(point.hour);
             int min = Integer.parseInt(point.min);
             if (hour == 0 && min == 0) {
-                scanPoints.add(96);
+                scanPoints.add(144);
                 continue;
             }
-            scanPoints.add((hour * 60 + min) / 15);
+            scanPoints.add((hour * 60 + min) / 10);
         }
         orderTasks.add(OrderTaskAssembler.setTimingScanTimingReportScanTimePoint(scanPoints));
         ArrayList<Integer> reportPoints = new ArrayList<>();
@@ -430,10 +431,10 @@ public class TimingScanTimingReportActivity extends BaseActivity implements Base
             int hour = Integer.parseInt(point.hour);
             int min = Integer.parseInt(point.min);
             if (hour == 0 && min == 0) {
-                reportPoints.add(96);
+                reportPoints.add(144);
                 continue;
             }
-            reportPoints.add((hour * 60 + min) / 15);
+            reportPoints.add((hour * 60 + min) / 10);
         }
         orderTasks.add(OrderTaskAssembler.setTimingScanTimingReportReportTimePoint(reportPoints));
         LoRaLW003V3MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));

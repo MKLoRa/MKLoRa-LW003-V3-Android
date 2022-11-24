@@ -25,7 +25,7 @@
             android:id="@+id/et_data_type"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="5dp"
             android:layout_weight="1.5"
             android:digits="0123456789abcdefABCDEF"
             android:hint="Data Type"
@@ -33,13 +33,13 @@
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:textColor="@color/lw003_v3_black_333333"
-            android:textSize="13sp" />
+            android:textSize="12sp" />
 
         <EditText
             android:id="@+id/et_start"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="5dp"
             android:layout_weight="1.0"
             android:hint="1-29"
             android:inputType="number"
@@ -72,7 +72,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="5dp"
             android:text="Byte"
             android:textColor="@color/lw003_v3_black_333333"
             android:textSize="13sp" />
