@@ -111,7 +111,7 @@ public class ParamsWriteTask extends OrderTask {
         response.responseValue = data;
     }
 
-    public void setTHSampleRate(@IntRange(from = 1, to = 60) int rate) {
+    public void setTHSampleRate(@IntRange(from = 1, to = 10) int rate) {
         data = new byte[]{
                 (byte) 0xED,
                 (byte) 0x01,
@@ -646,19 +646,13 @@ public class ParamsWriteTask extends OrderTask {
         response.responseValue = data;
     }
 
-    public void setFilterBXPButtonRules(@IntRange(from = 0, to = 1) int singleEnable,
-                                        @IntRange(from = 0, to = 1) int doubleEnable,
-                                        @IntRange(from = 0, to = 1) int longEnable,
-                                        @IntRange(from = 0, to = 1) int abnormalEnable) {
+    public void setFilterBXPButtonRules(@IntRange(from = 0, to = 15) int enable) {
         data = new byte[]{
                 (byte) 0xED,
                 (byte) 0x01,
                 (byte) ParamsKeyEnum.KEY_FILTER_BXP_BUTTON_RULES.getParamsKey(),
-                (byte) 0x04,
-                (byte) singleEnable,
-                (byte) doubleEnable,
-                (byte) longEnable,
-                (byte) abnormalEnable,
+                (byte) 0x01,
+                (byte) enable,
         };
         response.responseValue = data;
     }

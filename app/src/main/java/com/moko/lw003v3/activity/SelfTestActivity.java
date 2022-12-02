@@ -91,11 +91,9 @@ public class SelfTestActivity extends BaseActivity {
                                             int status = value[4] & 0xFF;
                                             mBind.tvSelftestStatus.setVisibility(status == 0 ? View.VISIBLE : View.GONE);
                                             if ((status & 0x01) == 0x01)
-                                                mBind.tvGpsStatus.setVisibility(View.VISIBLE);
-                                            if ((status & 0x02) == 0x02)
-                                                mBind.tvAxisStatus.setVisibility(View.VISIBLE);
-                                            if ((status & 0x04) == 0x04)
                                                 mBind.tvFlashStatus.setVisibility(View.VISIBLE);
+                                            if ((status & 0x02) == 0x02)
+                                                mBind.tvThStatus.setVisibility(View.VISIBLE);
                                         }
                                         break;
                                     case KEY_PCBA_STATUS:

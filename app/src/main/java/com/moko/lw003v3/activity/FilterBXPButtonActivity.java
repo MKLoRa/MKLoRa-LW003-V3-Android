@@ -110,10 +110,10 @@ public class FilterBXPButtonActivity extends BaseActivity {
                                 switch (configKeyEnum) {
                                     case KEY_FILTER_BXP_BUTTON_RULES:
                                         if (length > 0) {
-                                            mBind.cbSinglePress.setChecked(value[4] == 1);
-                                            mBind.cbDoublePress.setChecked(value[5] == 1);
-                                            mBind.cbLongPress.setChecked(value[6] == 1);
-                                            mBind.cbAbnormalInactivity.setChecked(value[7] == 1);
+                                            mBind.cbSinglePress.setChecked((value[4] & 0x01) == 0x01);
+                                            mBind.cbDoublePress.setChecked((value[4] & 0x02) == 0x02);
+                                            mBind.cbLongPress.setChecked((value[4] & 0x04) == 0x04);
+                                            mBind.cbAbnormalInactivity.setChecked((value[4] & 0x08) == 0x08);
                                         }
                                         break;
                                     case KEY_FILTER_BXP_BUTTON_ENABLE:
@@ -148,10 +148,11 @@ public class FilterBXPButtonActivity extends BaseActivity {
     private void saveParams() {
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.setFilterBXPButtonRules(mBind.cbSinglePress.isChecked() ? 1 : 0,
-                mBind.cbDoublePress.isChecked() ? 1 : 0,
-                mBind.cbLongPress.isChecked() ? 1 : 0,
-                mBind.cbAbnormalInactivity.isChecked() ? 1 : 0));
+        int enable = (mBind.cbSinglePress.isChecked() ? 0x01 : 0x00)
+                | (mBind.cbDoublePress.isChecked() ? 0x02 : 0x00)
+                | (mBind.cbLongPress.isChecked() ? 0x04 : 0x00)
+                | (mBind.cbAbnormalInactivity.isChecked() ? 0x08 : 0x00);
+        orderTasks.add(OrderTaskAssembler.setFilterBXPButtonRules(enable));
         orderTasks.add(OrderTaskAssembler.setFilterBXPButtonEnable(mBind.cbEnable.isChecked() ? 1 : 0));
         LoRaLW003V3MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }

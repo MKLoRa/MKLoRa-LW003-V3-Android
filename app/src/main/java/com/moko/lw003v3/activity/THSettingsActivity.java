@@ -147,7 +147,7 @@ public class THSettingsActivity extends BaseActivity {
             return false;
         }
         final int sampleRate = Integer.parseInt(sampleRateStr);
-        if (sampleRate < 1 || sampleRate > 60) {
+        if (sampleRate < 1 || sampleRate > 10) {
             return false;
         }
         return true;

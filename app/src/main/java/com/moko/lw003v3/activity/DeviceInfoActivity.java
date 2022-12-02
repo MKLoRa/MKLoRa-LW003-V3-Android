@@ -465,6 +465,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     }
 
     public void onBack(View view) {
+        if (isWindowLocked())
+            return;
         back();
     }
 
@@ -740,7 +742,14 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             dialog.show(getSupportFragmentManager());
         }
         if (callback.getResultCode() == RESULT_FIRST_USER) {
-            showDisconnectDialog();
+            String mac = callback.getData().getStringExtra(AppConstants.EXTRA_KEY_DEVICE_MAC);
+            mBind.frameContainer.postDelayed(() -> {
+                if (LoRaLW003V3MokoSupport.getInstance().isConnDevice(mac)) {
+                    LoRaLW003V3MokoSupport.getInstance().disConnectBle();
+                    return;
+                }
+                showDisconnectDialog();
+            }, 500);
         }
     });
 

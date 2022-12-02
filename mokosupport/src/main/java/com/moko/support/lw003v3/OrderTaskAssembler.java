@@ -786,7 +786,7 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask setTHSampleRate(@IntRange(from = 1, to = 60) int rate) {
+    public static OrderTask setTHSampleRate(@IntRange(from = 1, to = 10) int rate) {
         ParamsWriteTask task = new ParamsWriteTask();
         task.setTHSampleRate(rate);
         return task;
@@ -1032,12 +1032,9 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask setFilterBXPButtonRules(@IntRange(from = 0, to = 1) int singleEnable,
-                                                    @IntRange(from = 0, to = 1) int doubleEnable,
-                                                    @IntRange(from = 0, to = 1) int longEnable,
-                                                    @IntRange(from = 0, to = 1) int abnormalEnable) {
+    public static OrderTask setFilterBXPButtonRules(@IntRange(from = 0, to = 15) int enable) {
         ParamsWriteTask task = new ParamsWriteTask();
-        task.setFilterBXPButtonRules(singleEnable, doubleEnable, longEnable, abnormalEnable);
+        task.setFilterBXPButtonRules(enable);
         return task;
     }
 

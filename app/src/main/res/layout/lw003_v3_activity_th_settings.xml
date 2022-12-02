@@ -95,7 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:gravity="center"
-            android:hint="1~60"
+            android:hint="1~10"
             android:inputType="number"
             android:maxLength="2"
             android:text=""

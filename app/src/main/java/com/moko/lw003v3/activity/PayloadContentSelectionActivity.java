@@ -96,7 +96,7 @@ public class PayloadContentSelectionActivity extends BaseActivity {
 
     public void onEddystoneTLMContent(View view) {
         if (isWindowLocked()) return;
-        startActivity(new Intent(this, PayloadEddystoneURLContentActivity.class));
+        startActivity(new Intent(this, PayloadEddystoneTLMContentActivity.class));
     }
 
     public void onBXPIBeaconContent(View view) {
