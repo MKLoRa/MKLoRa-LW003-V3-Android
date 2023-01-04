@@ -114,9 +114,9 @@ public class PayloadBXPTHContentActivity extends BaseActivity {
                                             mBind.cbTxPower.setChecked((data & 0x08) == 0x08);
                                             mBind.cbRangingData.setChecked((data & 0x10) == 0x10);
                                             mBind.cbAdvInterval.setChecked((data & 0x20) == 0x20);
-                                            mBind.cbTemperature.setChecked((data & 0x40) == 0x40);
-                                            mBind.cbHumidity.setChecked((data & 0x80) == 0x80);
-                                            mBind.cbBatteryVoltage.setChecked((data & 0x0100) == 0x0100);
+                                            mBind.cbBatteryVoltage.setChecked((data & 0x40) == 0x40);
+                                            mBind.cbTemperature.setChecked((data & 0x80) == 0x80);
+                                            mBind.cbHumidity.setChecked((data & 0x0100) == 0x0100);
                                             mBind.cbRawDataAdv.setChecked((data & 0x0200) == 0x0200);
                                             mBind.cbRawDataResp.setChecked((data & 0x0400) == 0x0400);
                                         }
@@ -147,9 +147,9 @@ public class PayloadBXPTHContentActivity extends BaseActivity {
                 | (mBind.cbTxPower.isChecked() ? 0x08 : 0x00)
                 | (mBind.cbRangingData.isChecked() ? 0x10 : 0x00)
                 | (mBind.cbAdvInterval.isChecked() ? 0x20 : 0x00)
-                | (mBind.cbTemperature.isChecked() ? 0x40 : 0x00)
-                | (mBind.cbHumidity.isChecked() ? 0x80 : 0x00)
-                | (mBind.cbBatteryVoltage.isChecked() ? 0x0100 : 0x00)
+                | (mBind.cbBatteryVoltage.isChecked() ? 0x40 : 0x00)
+                | (mBind.cbTemperature.isChecked() ? 0x80 : 0x00)
+                | (mBind.cbHumidity.isChecked() ? 0x0100 : 0x00)
                 | (mBind.cbRawDataAdv.isChecked() ? 0x0200 : 0x00)
                 | (mBind.cbRawDataResp.isChecked() ? 0x0400 : 0x00);
         orderTasks.add(OrderTaskAssembler.setPayloadBXPTHContent(flag));

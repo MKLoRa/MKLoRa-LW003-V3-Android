@@ -61,10 +61,9 @@ public class DecoderModule {
                 String fileName = files[i];
                 File outFile = new File(dir, fileName);
                 if (outFile.exists()) {
-                    continue;
-                } else {
-                    outFile.createNewFile();
+                    outFile.delete();
                 }
+                outFile.createNewFile();
                 InputStream in = context.getAssets().open(assetDir + File.separator + fileName);
                 OutputStream out = new FileOutputStream(outFile);
                 byte[] buf = new byte[1024];

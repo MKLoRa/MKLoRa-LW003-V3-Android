@@ -114,11 +114,11 @@ public class PayloadBXPAccContentActivity extends BaseActivity {
                                             mBind.cbTxPower.setChecked((data & 0x08) == 0x08);
                                             mBind.cbRangingData.setChecked((data & 0x10) == 0x10);
                                             mBind.cbAdvInterval.setChecked((data & 0x20) == 0x20);
-                                            mBind.cbSampleRate.setChecked((data & 0x40) == 0x40);
-                                            mBind.cbFullScale.setChecked((data & 0x80) == 0x80);
-                                            mBind.cbMotionThreshold.setChecked((data & 0x0100) == 0x0100);
-                                            mBind.cb3AxisData.setChecked((data & 0x0200) == 0x0200);
-                                            mBind.cbBatteryVoltage.setChecked((data & 0x0400) == 0x0400);
+                                            mBind.cbBatteryVoltage.setChecked((data & 0x40) == 0x40);
+                                            mBind.cbSampleRate.setChecked((data & 0x80) == 0x80);
+                                            mBind.cbFullScale.setChecked((data & 0x0100) == 0x0100);
+                                            mBind.cbMotionThreshold.setChecked((data & 0x0200) == 0x0200);
+                                            mBind.cb3AxisData.setChecked((data & 0x0400) == 0x0400);
                                             mBind.cbRawDataAdv.setChecked((data & 0x0800) == 0x0800);
                                             mBind.cbRawDataResp.setChecked((data & 0x1000) == 0x1000);
                                         }
@@ -149,11 +149,11 @@ public class PayloadBXPAccContentActivity extends BaseActivity {
                 | (mBind.cbTxPower.isChecked() ? 0x08 : 0x00)
                 | (mBind.cbRangingData.isChecked() ? 0x10 : 0x00)
                 | (mBind.cbAdvInterval.isChecked() ? 0x20 : 0x00)
-                | (mBind.cbSampleRate.isChecked() ? 0x40 : 0x00)
-                | (mBind.cbFullScale.isChecked() ? 0x80 : 0x00)
-                | (mBind.cbMotionThreshold.isChecked() ? 0x0100 : 0x00)
-                | (mBind.cb3AxisData.isChecked() ? 0x0200 : 0x00)
-                | (mBind.cbBatteryVoltage.isChecked() ? 0x0400 : 0x00)
+                | (mBind.cbBatteryVoltage.isChecked() ? 0x40 : 0x00)
+                | (mBind.cbSampleRate.isChecked() ? 0x80 : 0x00)
+                | (mBind.cbFullScale.isChecked() ? 0x0100 : 0x00)
+                | (mBind.cbMotionThreshold.isChecked() ? 0x0200 : 0x00)
+                | (mBind.cb3AxisData.isChecked() ? 0x0400 : 0x00)
                 | (mBind.cbRawDataAdv.isChecked() ? 0x0800 : 0x00)
                 | (mBind.cbRawDataResp.isChecked() ? 0x1000 : 0x00);
         orderTasks.add(OrderTaskAssembler.setPayloadBXPAccContent(flag));

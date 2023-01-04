@@ -40,6 +40,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -169,17 +170,17 @@ public class ExportDataActivity extends BaseActivity {
                                         }
                                     }
                                     Calendar calendar = Calendar.getInstance();
-                                    TimeZone timeZone = TimeZone.getTimeZone(id);
-                                    calendar.setTimeZone(timeZone);
                                     calendar.setTimeInMillis(timestamp);
-                                    final String time = Utils.calendar2strDate(calendar, AppConstants.PATTERN_YYYY_MM_DD_HH_MM_SS);
-                                    StringBuffer stringBuffer = new StringBuffer();
+                                    SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.PATTERN_YYYY_MM_DD_HH_MM_SS, Locale.US);
+                                    sdf.setTimeZone(TimeZone.getTimeZone(id.replaceAll("UTC", "GMT")));
+                                    final String time = sdf.format(calendar.getTime());
+                                    StringBuilder stringBuilder = new StringBuilder();
                                     for (int i = 0, l = macBytes.length; i < l; i++) {
-                                        stringBuffer.append(MokoUtils.byte2HexString(macBytes[i]));
+                                        stringBuilder.append(MokoUtils.byte2HexString(macBytes[i]));
                                         if (i < (l - 1))
-                                            stringBuffer.append(":");
+                                            stringBuilder.append(":");
                                     }
-                                    final String mac = stringBuffer.toString();
+                                    final String mac = stringBuilder.toString();
 
                                     final int rssi = value[index++];
                                     final String rssiStr = String.format("%ddBm", rssi);

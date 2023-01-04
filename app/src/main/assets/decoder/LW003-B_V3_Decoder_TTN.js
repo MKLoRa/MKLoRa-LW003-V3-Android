@@ -581,7 +581,7 @@ function Decoder(bytes, port) {
                 if (flag & 0x40) {
                     var length = bytes[parse_len++];
                     beacon_len++;
-                    data.device_id = bytesToString(bytes, parse_len, length);
+                    data.device_id = bytesToHexString(bytes, parse_len, length);
                     parse_len += length;
                     beacon_len += length;
                 }

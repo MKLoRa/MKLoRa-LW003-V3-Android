@@ -203,7 +203,7 @@ public class SystemInfoActivity extends BaseActivity {
                                             int bleScan = MokoUtils.toInt(Arrays.copyOfRange(value, 8, 12));
                                             int lora = MokoUtils.toInt(Arrays.copyOfRange(value, 12, 16));
                                             mBind.tvBleAdv.setText(String.format("%d times", bleAdv));
-                                            mBind.tvBleScan.setText(String.format("%d ms", bleScan));
+                                            mBind.tvBleScan.setText(String.format("%d s", bleScan));
                                             mBind.tvLora.setText(String.format("%d ms", lora));
                                         }
                                         break;
