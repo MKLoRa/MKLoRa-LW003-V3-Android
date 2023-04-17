@@ -22,6 +22,7 @@ public class AboutActivity extends BaseActivity {
         if (!BuildConfig.IS_LIBRARY) {
             mBind.appVersion.setText(String.format("APP Version:V%s", Utils.getVersionInfo(this)));
         }
+        mBind.tvDecode.setOnClickListener(v-> startActivity(new Intent(this,DecoderActivity.class)));
     }
 
     public void onBack(View view) {

@@ -15,6 +15,9 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 
+import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.elvishew.xlog.XLog;
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -45,8 +48,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import androidx.annotation.Nullable;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import no.nordicsemi.android.dfu.DfuProgressListener;
 import no.nordicsemi.android.dfu.DfuProgressListenerAdapter;
 import no.nordicsemi.android.dfu.DfuServiceInitiator;
@@ -265,7 +266,9 @@ public class SystemInfoActivity extends BaseActivity {
             return;
         showSyncingProgressDialog();
         new Thread(() -> {
-            File file = DecoderModule.getInstance(this).createNewDecoder(mPayloadFlag);
+            DecoderModule instance = DecoderModule.getInstance(getApplicationContext());
+            instance.createNewDecoder(mPayloadFlag, instance.getNewHtmlFilePath(), instance.getFinalHtmlPath());
+            File file = instance.createNewDecoder(mPayloadFlag, instance.getNewFilePath(), instance.getFinalFilePath());
             runOnUiThread(() -> {
                 dismissSyncProgressDialog();
                 if (file != null) {

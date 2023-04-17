@@ -31,6 +31,18 @@
             android:textColor="@color/lw003_v3_white_ffffff"
             android:textSize="17sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvDecode"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="Decode"
+            android:textColor="@color/lw003_v3_white_ffffff"
+            android:textSize="16sp" />
     </RelativeLayout>
 
     <ImageView
