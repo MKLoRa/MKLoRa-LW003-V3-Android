@@ -39,6 +39,7 @@ public class DecoderActivity extends BaseActivity {
 
     @SuppressLint("SetJavaScriptEnabled")
     private void decode() {
+        if (isWindowLocked()) return;
         if (TextUtils.isEmpty(mBind.etRawData.getText())) {
             ToastUtils.showToast(this, "please input raw data first");
             return;
@@ -47,10 +48,6 @@ public class DecoderActivity extends BaseActivity {
             ToastUtils.showToast(this, "please input port first");
             return;
         }
-        showLoadingProgressDialog();
-        String str = mBind.etRawData.getText().toString().replaceAll(" ","");
-        String rawStr = "\'" + str + "\'";
-        int port = Integer.parseInt(mBind.etPort.getText().toString().trim());
         //导出数据内容
         String path = DecoderModule.getInstance(getApplicationContext()).getNewHtmlFilePath();
         if (TextUtils.isEmpty(path)) {
@@ -62,6 +59,10 @@ public class DecoderActivity extends BaseActivity {
             ToastUtils.showToast(this, "file not exit,please export data first");
             return;
         }
+        showLoadingProgressDialog();
+        String str = mBind.etRawData.getText().toString().replaceAll(" ","");
+        String rawStr = "\'" + str + "\'";
+        int port = Integer.parseInt(mBind.etPort.getText().toString().trim());
         if (null == mWebView) {
             mWebView = new WebView(this);
             mWebView.getSettings().setJavaScriptEnabled(true);
