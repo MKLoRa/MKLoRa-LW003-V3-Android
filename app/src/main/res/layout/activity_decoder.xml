@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/lw003_v3_white_ffffff"
@@ -95,7 +94,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
         android:background="@drawable/lw003_v3_shape_radius_blue_btn_bg"
-        android:text="decoder"
+        android:text="decode"
         android:textColor="@color/lw003_v3_white_ffffff"
         android:textSize="18sp" />
 
