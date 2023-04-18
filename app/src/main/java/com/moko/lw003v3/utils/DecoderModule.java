@@ -2,6 +2,7 @@ package com.moko.lw003v3.utils;
 
 import android.content.Context;
 
+import com.elvishew.xlog.XLog;
 import com.moko.lw003v3.activity.LoRaLW003V3MainActivity;
 import com.moko.lw003v3.entity.PayloadFlag;
 
@@ -43,6 +44,7 @@ public class DecoderModule {
 
     public void copyAssets2SD() {
         copyAssets(context, FOLDER_NAME, LoRaLW003V3MainActivity.PATH_LOGCAT + File.separator + FOLDER_NAME);
+        copyAssets(context, "html", LoRaLW003V3MainActivity.PATH_LOGCAT + File.separator + "html");
     }
 
     private void copyAssets(Context context, String assetDir, String dir) {
@@ -89,15 +91,23 @@ public class DecoderModule {
         return LoRaLW003V3MainActivity.PATH_LOGCAT + File.separator + FOLDER_NAME + File.separator + NEW_DECODER;
     }
 
-    public File createNewDecoder(PayloadFlag flag) {
+    public String getNewHtmlFilePath() {
+        return LoRaLW003V3MainActivity.PATH_LOGCAT + File.separator + "html" + File.separator + "LW003-B_V3_Decoder_Final.html";
+    }
+
+    public String getFinalHtmlPath() {
+        return LoRaLW003V3MainActivity.PATH_LOGCAT + File.separator + "html" + File.separator + "decoder.html";
+    }
+
+    public File createNewDecoder(PayloadFlag flag, String outFilePath, String finalFilePath) {
         try {
-            final String outFilePath = getNewFilePath();
+//            final String outFilePath = getNewFilePath();
             File outFile = new File(outFilePath);
             if (outFile.exists()) {
                 outFile.delete();
             }
             outFile.createNewFile();
-            final String finalFilePath = getFinalFilePath();
+//            final String finalFilePath = getFinalFilePath();
             FileInputStream in = new FileInputStream(finalFilePath);
             FileOutputStream out = new FileOutputStream(outFile);
             InputStreamReader inReader = new InputStreamReader(in);
@@ -154,5 +164,26 @@ public class DecoderModule {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private void copyNewFileAndRename(String newPath, String oldPath) throws IOException {
+        //需要复制到的路径，以及图片的新命名+格式
+        File result = new File(newPath);
+        //判断该文件夹是否存在,不存在则新增
+        if (!result.getParentFile().exists()) {
+            result.getParentFile().mkdirs();
+        }
+        FileInputStream input = new FileInputStream(oldPath);
+        FileOutputStream out = new FileOutputStream(result);
+        //一个容量，相当于打水的桶，可以自定义大小
+        byte[] buffer = new byte[1024];
+        int hasRead;
+        while ((hasRead = input.read(buffer)) > 0) {
+            //0：表示每次从0开始
+            out.write(buffer, 0, hasRead);
+        }
+        XLog.i("333333path=" + result.getAbsolutePath());
+        input.close();
+        out.close();
     }
 }
