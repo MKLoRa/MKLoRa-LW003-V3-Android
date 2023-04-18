@@ -42,25 +42,23 @@ public class DecoderActivity extends BaseActivity {
         if (isWindowLocked()) return;
         if (TextUtils.isEmpty(mBind.etRawData.getText())) {
             ToastUtils.showToast(this, "please input raw data first");
+            mBind.tvResult.setText("");
             return;
         }
         if (TextUtils.isEmpty(mBind.etPort.getText())) {
             ToastUtils.showToast(this, "please input port first");
+            mBind.tvResult.setText("");
             return;
         }
         //导出数据内容
         String path = DecoderModule.getInstance(getApplicationContext()).getNewHtmlFilePath();
-        if (TextUtils.isEmpty(path)) {
+        if (TextUtils.isEmpty(path) || !(new File(path)).exists()) {
             ToastUtils.showToast(this, "file not exit,please export data first");
-            return;
-        }
-        File file = new File(path);
-        if (!file.exists()) {
-            ToastUtils.showToast(this, "file not exit,please export data first");
+            mBind.tvResult.setText("");
             return;
         }
         showLoadingProgressDialog();
-        String str = mBind.etRawData.getText().toString().replaceAll(" ","");
+        String str = mBind.etRawData.getText().toString().replaceAll(" ", "");
         String rawStr = "\'" + str + "\'";
         int port = Integer.parseInt(mBind.etPort.getText().toString().trim());
         if (null == mWebView) {
@@ -77,6 +75,7 @@ public class DecoderActivity extends BaseActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                //现在很少还有4.4的系统了吧
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     mWebView.evaluateJavascript("javascript:Decoder(" + rawStr + "," + port + ")", value -> {
                         String json = value.substring(1, value.length() - 1);
@@ -111,8 +110,12 @@ public class DecoderActivity extends BaseActivity {
         }
     }
 
+    /**
+     * 格式化一下json数据显示格式 缩进 换行啥的这些
+     * @param strJson json
+     * @return 格式化后的json字符串
+     */
     private String stringToJSON(String strJson) {
-        // 计数tab的个数
         int tabNum = 0;
         StringBuilder jsonFormat = new StringBuilder();
         int length = strJson.length();
@@ -122,16 +125,12 @@ public class DecoderActivity extends BaseActivity {
             char c = strJson.charAt(i);
             if (c == '{') {
                 tabNum++;
-                jsonFormat.append(c).append("\n");
-                jsonFormat.append(getSpaceOrTab(tabNum));
+                jsonFormat.append(c).append("\n").append(getSpaceOrTab(tabNum));
             } else if (c == '}') {
                 tabNum--;
-                jsonFormat.append("\n");
-                jsonFormat.append(getSpaceOrTab(tabNum));
-                jsonFormat.append(c);
+                jsonFormat.append("\n").append(getSpaceOrTab(tabNum)).append(c);
             } else if (c == ',') {
-                jsonFormat.append(c).append("\n");
-                jsonFormat.append(getSpaceOrTab(tabNum));
+                jsonFormat.append(c).append("\n").append(getSpaceOrTab(tabNum));
             } else if (c == ':') {
                 jsonFormat.append(c).append(" ");
             } else if (c == '[') {
@@ -140,8 +139,7 @@ public class DecoderActivity extends BaseActivity {
                 if (next == ']') {
                     jsonFormat.append(c);
                 } else {
-                    jsonFormat.append(c).append("\n");
-                    jsonFormat.append(getSpaceOrTab(tabNum));
+                    jsonFormat.append(c).append("\n").append(getSpaceOrTab(tabNum));
                 }
             } else if (c == ']') {
                 tabNum--;
@@ -165,5 +163,4 @@ public class DecoderActivity extends BaseActivity {
         }
         return sbTab.toString();
     }
-
 }
