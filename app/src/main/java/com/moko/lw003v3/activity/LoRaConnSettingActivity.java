@@ -258,7 +258,7 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
                                     case KEY_LORA_CLASS_TYPE:
                                         if (length > 0) {
                                             final int classType = value[4] & 0xFF;
-                                            mSelectedDeviceType = classType == 0  ? 0 : 1;
+                                            mSelectedDeviceType = classType == 0 ? 0 : 1;
                                             mBind.tvDeviceType.setText(mDeviceTypeList.get(mSelectedDeviceType));
                                         }
                                         break;
@@ -345,21 +345,8 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
             // 注销广播
             unregisterReceiver(mReceiver);
         }
-        EventBus.getDefault().unregister(this);
-    }
-
-    private LoadingMessageDialog mLoadingMessageDialog;
-
-    public void showSyncingProgressDialog() {
-        mLoadingMessageDialog = new LoadingMessageDialog();
-        mLoadingMessageDialog.setMessage("Syncing..");
-        mLoadingMessageDialog.show(getSupportFragmentManager());
-
-    }
-
-    public void dismissSyncProgressDialog() {
-        if (mLoadingMessageDialog != null)
-            mLoadingMessageDialog.dismissAllowingStateLoss();
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
     }
 
     public void onBack(View view) {
@@ -372,6 +359,7 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
     }
 
     private void backHome() {
+        EventBus.getDefault().unregister(this);
         setResult(RESULT_OK);
         finish();
     }

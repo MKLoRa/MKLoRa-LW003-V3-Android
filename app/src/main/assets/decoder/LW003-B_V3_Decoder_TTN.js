@@ -49,25 +49,36 @@ if (temperature > 0x8000)
 data.temperature = "-" + (0x10000 - temperature) / 100 + "°C";
 else
 data.temperature = temperature / 100 + "°C";
-data.humility = bytesToInt(bytes, 7, 2) / 100 + "%";
+data.humidity = bytesToInt(bytes, 7, 2) / 100 + "%";
 data.timezone = timezone_decode(bytes[9]);
 if (fPort == 3) {
 data.message_type = messageTypeArray[bytes[10]];
+} else {
+data.message_type = "Turn on";
 }
 } else {
 data.timezone = timezone_decode(bytes[5]);
 if (fPort == 3) {
 data.message_type = messageTypeArray[bytes[6]];
+} else {
+data.message_type = "Turn on";
 }
 }
+// var timestamp = new Date().getTime();
+// data.timestamp = timestamp;
+
+var date = new Date();
+data.time = date.toJSON();
 } else if (fPort == 2) {
 // Turn off info
 data.battery_charging_status = bytes[0] & 0x80 ? "in charging" : "no charging";
 data.battery_level = (bytes[0] & 0x7F) + "%";
 data.battery_voltage = bytesToInt(bytes, 1, 2) + "mV";
-data.timestamp = parse_time(bytesToInt(bytes, 3, 4), bytes[7] * 0.5);
+data.time = parse_time(bytesToInt(bytes, 3, 4), bytes[7] * 0.5);
+data.timestamp = bytesToInt(bytes, 3, 4);
 data.timezone = timezone_decode(bytes[7]);
 data.shutdown_type = shutDownTypeArray[bytes[8]];
+data.message_type = "Turn off";
 } else if (fPort == 4) {
 // Adv event info
 data.battery_charging_status = bytes[0] & 0x80 ? "in charging" : "no charging";
@@ -76,12 +87,19 @@ data.scan_cycle_start_timestamp = parse_time(bytesToInt(bytes, 1, 4), bytes[5] *
 data.scan_cycle_start_timezone = timezone_decode(bytes[5]);
 data.adv_interrupt_timestamp = parse_time(bytesToInt(bytes, 6, 4), bytes[10] * 0.5);
 data.adv_interrupt_timezone = timezone_decode(bytes[10]);
+data.message_type = "Adv event";
 } else if (fPort == 5) {
 // Scan data info
 data.packet_sequence = bytes[0];
-data.payload_reporting_timestamp = parse_time(bytesToInt(bytes, 1, 4), bytes[5] * 0.5);
-data.payload_reporting_timezone = timezone_decode(bytes[5]);
+data.time = parse_time(bytesToInt(bytes, 1, 4), bytes[5] * 0.5);
+data.timestamp = bytesToInt(bytes, 1, 4);
+data.timezone = timezone_decode(bytes[5]);
 data.beacon_number = bytes[6];
+data.message_type = "Scan data";
+
+// var date = new Date();
+// data.time = date.toJSON();
+
 var parse_len = 7;
 var datas = [];
 for (var i = 0; i < data.beacon_number; i++) {
@@ -573,7 +591,7 @@ parse_len += 2;
 beacon_len += 2;
 }
 if (flag & 0x0100) {
-item.humility = bytesToInt(bytes, parse_len, 2) / 10;
+item.humidity = bytesToInt(bytes, parse_len, 2) / 10;
 parse_len += 2;
 beacon_len += 2;
 }
@@ -902,7 +920,7 @@ var twoStr_unsign = "";
 twoStr = parseInt(twoStr, 2) - 1; // 补码：(负数)反码+1，符号位不变；相对十进制来说也是 +1，但这里是负数，+1就是绝对值数据-1
 twoStr = twoStr.toString(2);
 twoStr_unsign = twoStr.substring(1, bitNum); // 舍弃首位(符号位)
-// 去除首字符，将0转为1，将1转为0 反码
+// 去除首字符，将0转为1，将1转为0   反码
 twoStr_unsign = twoStr_unsign.replace(/0/g, "z");
 twoStr_unsign = twoStr_unsign.replace(/1/g, "0");
 twoStr_unsign = twoStr_unsign.replace(/z/g, "1");

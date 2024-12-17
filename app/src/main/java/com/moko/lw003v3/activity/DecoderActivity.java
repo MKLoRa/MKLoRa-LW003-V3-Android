@@ -91,25 +91,6 @@ public class DecoderActivity extends BaseActivity {
         });
     }
 
-    private LoadingDialog mLoadingDialog;
-
-    private void showLoadingProgressDialog() {
-        if (null != mLoadingDialog && mLoadingDialog.isAdded() && !mLoadingDialog.isDetached()) {
-            mLoadingDialog.dismissAllowingStateLoss();
-        }
-        mLoadingDialog = null;
-        mLoadingDialog = new LoadingDialog();
-        if (!mLoadingDialog.isAdded())
-            mLoadingDialog.show(getSupportFragmentManager());
-    }
-
-    private void dismissLoadingProgressDialog() {
-        if (mLoadingDialog != null && mLoadingDialog.isAdded() && !mLoadingDialog.isDetached()) {
-            mLoadingDialog.dismissAllowingStateLoss();
-            mLoadingDialog = null;
-        }
-    }
-
     /**
      * 格式化一下json数据显示格式 缩进 换行啥的这些
      * @param strJson json

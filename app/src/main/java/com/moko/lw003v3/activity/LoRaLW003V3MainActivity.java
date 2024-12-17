@@ -500,19 +500,6 @@ public class LoRaLW003V3MainActivity extends BaseActivity implements MokoScanDev
         }
     });
 
-    private LoadingDialog mLoadingDialog;
-
-    private void showLoadingProgressDialog() {
-        mLoadingDialog = new LoadingDialog();
-        mLoadingDialog.show(getSupportFragmentManager());
-
-    }
-
-    private void dismissLoadingProgressDialog() {
-        if (mLoadingDialog != null)
-            mLoadingDialog.dismissAllowingStateLoss();
-    }
-
     private LoadingMessageDialog mLoadingMessageDialog;
 
     private void showLoadingMessageDialog() {
