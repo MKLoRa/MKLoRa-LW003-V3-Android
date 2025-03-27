@@ -16,7 +16,7 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.lw003v3.databinding.Lw003V3ActivityAppSettingBinding;
-import com.moko.lw003v3.dialog.LoadingMessageDialog;
+import com.moko.lib.loraui.dialog.LoadingMessageDialog;
 import com.moko.lw003v3.utils.ToastUtils;
 import com.moko.support.lw003v3.LoRaLW003V3MokoSupport;
 import com.moko.support.lw003v3.OrderTaskAssembler;

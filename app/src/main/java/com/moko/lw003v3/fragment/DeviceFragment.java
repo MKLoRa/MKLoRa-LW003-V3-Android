@@ -11,7 +11,7 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.lw003v3.R;
 import com.moko.lw003v3.activity.DeviceInfoActivity;
 import com.moko.lw003v3.databinding.Lw003V3FragmentDeviceBinding;
-import com.moko.lw003v3.dialog.BottomDialog;
+import com.moko.lib.loraui.dialog.BottomDialog;
 import com.moko.support.lw003v3.LoRaLW003V3MokoSupport;
 import com.moko.support.lw003v3.OrderTaskAssembler;
 
@@ -95,7 +95,7 @@ public class DeviceFragment extends Fragment {
 
     public void setLowPowerPayload(int enable) {
         mLowPowerPayloadEnable = enable == 1;
-        mBind.ivLowPowerPayload.setImageResource(mLowPowerPayloadEnable ? R.drawable.lw003_v3_ic_checked : R.drawable.lw003_v3_ic_unchecked);
+        mBind.ivLowPowerPayload.setImageResource(mLowPowerPayloadEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
     }
 
     public void setLowPower(int lowPower) {

@@ -19,13 +19,12 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
+import com.moko.lib.loraui.dialog.AlertMessageDialog;
+import com.moko.lib.loraui.dialog.BottomDialog;
+import com.moko.lib.loraui.dialog.ChangePasswordDialog;
 import com.moko.lw003v3.AppConstants;
 import com.moko.lw003v3.R;
 import com.moko.lw003v3.databinding.Lw003V3ActivityDeviceInfoBinding;
-import com.moko.lw003v3.dialog.AlertMessageDialog;
-import com.moko.lw003v3.dialog.BottomDialog;
-import com.moko.lw003v3.dialog.ChangePasswordDialog;
-import com.moko.lw003v3.dialog.LoadingMessageDialog;
 import com.moko.lw003v3.fragment.DeviceFragment;
 import com.moko.lw003v3.fragment.GeneralFragment;
 import com.moko.lw003v3.fragment.LoRaFragment;
@@ -82,7 +81,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         fragmentManager = getFragmentManager();
         initFragment();
         mBind.radioBtnLora.setChecked(true);
-        mBind.tvTitle.setText(R.string.title_lora_lw003_v3);
+        mBind.tvTitle.setText(R.string.title_lora);
         mBind.rgOptions.setOnCheckedChangeListener(this);
         EventBus.getDefault().register(this);
         mUploadMode = new ArrayList<>();
@@ -464,7 +463,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 showSyncingProgressDialog();
                 scannerFragment.saveParams();
             } else {
-                ToastUtils.showToast(this,"Para error!");
+                ToastUtils.showToast(this, "Para error!");
             }
         }
         if (mBind.radioBtnGeneral.isChecked()) {
@@ -549,7 +548,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     }
 
     private void showLoRaAndGetData() {
-        mBind.tvTitle.setText(R.string.title_lora_lw003_v3);
+        mBind.tvTitle.setText(R.string.title_lora);
         mBind.ivSave.setVisibility(View.GONE);
         fragmentManager.beginTransaction()
                 .show(loraFragment)

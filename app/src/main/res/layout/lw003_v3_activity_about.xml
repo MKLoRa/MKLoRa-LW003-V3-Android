@@ -2,25 +2,25 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/lw003_v3_white_ffffff">
+    android:background="@color/white_ffffff">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        android:background="@color/lw003_v3_blue_2f84d0">
+        android:background="@color/blue_2f84d0">
 
         <TextView
             android:id="@+id/tv_back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clickable="true"
-            android:drawableLeft="@drawable/lw003_v3_ic_back"
+            android:drawableLeft="@drawable/ic_back"
             android:drawablePadding="6dp"
             android:gravity="center_vertical"
             android:onClick="onBack"
             android:paddingLeft="16dp"
             android:text=""
-            android:textColor="@color/lw003_v3_white_ffffff"
+            android:textColor="@color/white_ffffff"
             android:textSize="15sp" />
 
         <TextView
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="@string/about_title"
-            android:textColor="@color/lw003_v3_white_ffffff"
+            android:textColor="@color/white_ffffff"
             android:textSize="17sp"
             android:textStyle="bold" />
 
@@ -41,7 +41,7 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:text="Decode"
-            android:textColor="@color/lw003_v3_white_ffffff"
+            android:textColor="@color/white_ffffff"
             android:textSize="16sp" />
     </RelativeLayout>
 
@@ -61,7 +61,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
         android:text="LW003-B"
-        android:textColor="@color/lw003_v3_grey_888888"
+        android:textColor="@color/grey_888888"
         android:textSize="20sp" />
 
     <TextView
@@ -72,7 +72,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:text="APP Version:V1.0.5"
-        android:textColor="@color/lw003_v3_grey_a8a8a8"
+        android:textColor="@color/grey_a8a8a8"
         android:textSize="17sp" />
 
     <TextView
@@ -83,7 +83,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
         android:text="FW Version:V3.0"
-        android:textColor="@color/lw003_v3_grey_a8a8a8"
+        android:textColor="@color/grey_a8a8a8"
         android:textSize="17sp" />
 
     <TextView
@@ -93,7 +93,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="150dp"
         android:text="@string/company_name"
-        android:textColor="@color/lw003_v3_black_333333"
+        android:textColor="@color/black_333333"
         android:textSize="20sp" />
 
     <TextView
@@ -106,12 +106,12 @@
         android:clickable="true"
         android:onClick="onCompanyWebsite"
         android:text="@string/company_website"
-        android:textColor="@color/lw003_v3_blue_03bfea"
+        android:textColor="@color/blue_03bfea"
         android:textSize="20sp" />
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:src="@drawable/lw003_v3_ic_about_bg" />
+        android:src="@drawable/ic_about_bg" />
 </RelativeLayout>

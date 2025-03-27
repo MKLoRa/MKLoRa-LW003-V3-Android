@@ -4,26 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/lw003_v3_grey_f2f2f2"
+    android:background="@color/grey_f2f2f2"
     android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        android:background="@color/lw003_v3_blue_2f84d0">
+        android:background="@color/blue_2f84d0">
 
         <TextView
             android:id="@+id/tv_back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clickable="true"
-            android:drawableLeft="@drawable/lw003_v3_ic_back"
+            android:drawableLeft="@drawable/ic_back"
             android:drawablePadding="6dp"
             android:gravity="center_vertical"
             android:onClick="onBack"
             android:paddingLeft="16dp"
             android:text=""
-            android:textColor="@color/lw003_v3_white_ffffff"
+            android:textColor="@color/white_ffffff"
             android:textSize="15sp" />
 
         <TextView
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="@string/scan_always_timing_report"
-            android:textColor="@color/lw003_v3_white_ffffff"
+            android:textColor="@color/white_ffffff"
             android:textSize="17sp"
             android:textStyle="bold" />
 
@@ -44,7 +44,7 @@
             android:onClick="onSave"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:src="@drawable/lw003_v3_ic_save" />
+            android:src="@drawable/ic_save" />
 
     </RelativeLayout>
 
@@ -53,14 +53,14 @@
         android:layout_height="0dp"
         android:layout_margin="10dp"
         android:layout_weight="1.0"
-        android:background="@color/lw003_v3_white_ffffff"
+        android:background="@color/white_ffffff"
         android:padding="10dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Report Time Point"
-            android:textColor="@color/lw003_v3_black_333333"
+            android:textColor="@color/black_333333"
             android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/iv_time_point_add"
@@ -74,7 +74,7 @@
             android:clickable="true"
             android:onClick="onTimePointAdd"
             android:padding="12dp"
-            android:src="@drawable/lw003_v3_ic_add"
+            android:src="@drawable/ic_add"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -86,7 +86,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_time_point_add"
-            tools:listitem="@layout/lw003_v3_item_time_point" />
+            tools:listitem="@layout/item_time_point" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

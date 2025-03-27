@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/lw003_v3_white_ffffff"
+    android:background="@color/white_ffffff"
     android:orientation="vertical">
 
 
@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"
             android:text="Data block 1"
-            android:textColor="@color/lw003_v3_black_333333"
+            android:textColor="@color/black_333333"
             android:textSize="13sp" />
 
         <EditText
@@ -32,7 +32,7 @@
             android:maxLength="2"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:textColor="@color/lw003_v3_black_333333"
+            android:textColor="@color/black_333333"
             android:textSize="12sp" />
 
         <EditText
@@ -46,14 +46,14 @@
             android:maxLength="2"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:textColor="@color/lw003_v3_black_333333"
+            android:textColor="@color/black_333333"
             android:textSize="13sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="~"
-            android:textColor="@color/lw003_v3_black_333333"
+            android:textColor="@color/black_333333"
             android:textSize="13sp" />
 
         <EditText
@@ -66,7 +66,7 @@
             android:maxLength="2"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:textColor="@color/lw003_v3_black_333333"
+            android:textColor="@color/black_333333"
             android:textSize="13sp" />
 
         <TextView
@@ -74,7 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:text="Byte"
-            android:textColor="@color/lw003_v3_black_333333"
+            android:textColor="@color/black_333333"
             android:textSize="13sp" />
 
         <ImageView
@@ -83,10 +83,10 @@
             android:layout_height="40dp"
             android:paddingLeft="12dp"
             android:paddingRight="12dp"
-            android:src="@drawable/lw003_v3_ic_del" />
+            android:src="@drawable/ic_del" />
 
     </LinearLayout>
 
-    <View style="@style/lw003_v3_divider_line" />
+    <View style="@style/divider_line" />
 
 </LinearLayout>

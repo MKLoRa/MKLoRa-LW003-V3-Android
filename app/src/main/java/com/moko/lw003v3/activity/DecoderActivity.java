@@ -8,8 +8,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.elvishew.xlog.XLog;
-import com.moko.lw003v3.databinding.ActivityDecoderBinding;
-import com.moko.lw003v3.dialog.LoadingDialog;
+import com.moko.lw003v3.databinding.Lw003V3ActivityDecoderBinding;
 import com.moko.lw003v3.utils.DecoderModule;
 import com.moko.lw003v3.utils.ToastUtils;
 
@@ -21,13 +20,13 @@ import java.io.File;
  * @des:
  */
 public class DecoderActivity extends BaseActivity {
-    private ActivityDecoderBinding mBind;
+    private Lw003V3ActivityDecoderBinding mBind;
     private WebView mWebView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = ActivityDecoderBinding.inflate(getLayoutInflater());
+        mBind = Lw003V3ActivityDecoderBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         initView();
     }
@@ -93,6 +92,7 @@ public class DecoderActivity extends BaseActivity {
 
     /**
      * 格式化一下json数据显示格式 缩进 换行啥的这些
+     *
      * @param strJson json
      * @return 格式化后的json字符串
      */
