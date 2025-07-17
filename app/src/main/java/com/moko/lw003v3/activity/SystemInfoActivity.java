@@ -15,9 +15,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 
-import androidx.annotation.Nullable;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import com.elvishew.xlog.XLog;
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -27,7 +24,6 @@ import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.lw003v3.AppConstants;
 import com.moko.lw003v3.databinding.Lw003V3ActivitySystemInfoBinding;
-import com.moko.lib.loraui.dialog.LoadingMessageDialog;
 import com.moko.lw003v3.entity.PayloadFlag;
 import com.moko.lw003v3.service.DfuService;
 import com.moko.lw003v3.utils.DecoderModule;
@@ -48,6 +44,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import no.nordicsemi.android.dfu.DfuProgressListener;
 import no.nordicsemi.android.dfu.DfuProgressListenerAdapter;
 import no.nordicsemi.android.dfu.DfuServiceInitiator;
